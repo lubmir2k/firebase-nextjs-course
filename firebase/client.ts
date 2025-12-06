@@ -11,6 +11,12 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+if (Object.values(firebaseConfig).some((value) => !value)) {
+  throw new Error(
+    "Firebase client environment variables are not set. Check your .env.local file."
+  );
+}
+
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth: Auth = getAuth(app);

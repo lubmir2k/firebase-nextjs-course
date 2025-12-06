@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 /**
  * Script to populate .env.local with Firebase service account credentials
- * Usage: node scripts/setup-firebase-env.js <path-to-service-account.json>
+ * Usage: node scripts/setup-firebase-env.cjs <path-to-service-account.json>
  */
 
 const fs = require("fs");
