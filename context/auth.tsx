@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   User,
   onAuthStateChanged,
@@ -36,10 +42,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await signInWithPopup(auth, provider);
   };
 
+  const value = useMemo(
+    () => ({ currentUser, logout, loginWithGoogle }),
+    [currentUser]
+  );
+
   return (
-    <AuthContext.Provider value={{ currentUser, logout, loginWithGoogle }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 };
 

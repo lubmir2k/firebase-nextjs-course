@@ -26,8 +26,8 @@ export default function AuthButtons() {
                 <Image
                   src={auth.currentUser.photoURL}
                   alt={`${auth.currentUser.displayName} Avatar`}
-                  width={70}
-                  height={70}
+                  width={32}
+                  height={32}
                 />
               )}
               <AvatarFallback>
@@ -52,7 +52,7 @@ export default function AuthButtons() {
             <DropdownMenuItem asChild>
               <Link href="/account/my-favourites">My Favourites</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={async () => await auth.logout()}>
+            <DropdownMenuItem onClick={auth.logout}>
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
