@@ -18,7 +18,7 @@ export default function AuthButtons() {
 
   return (
     <>
-      {auth?.currentUser ? (
+      {auth.currentUser ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
@@ -65,7 +65,7 @@ export default function AuthButtons() {
           >
             Login
           </Link>
-          <div className="h-8 w-[1px] bg-white/50" />
+          <div role="separator" aria-orientation="vertical" className="h-8 w-[1px] bg-white/50" />
           <Link
             href="/register"
             className="uppercase tracking-widest hover:underline"
