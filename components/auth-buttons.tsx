@@ -3,6 +3,7 @@
 import { useAuth } from "@/context/auth";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 
 export default function AuthButtons() {
   const auth = useAuth();
+  const router = useRouter();
 
   return (
     <>
@@ -46,13 +48,22 @@ export default function AuthButtons() {
             <DropdownMenuItem asChild>
               <Link href="/account">My Account</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/admin-dashboard">Admin Dashboard</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/account/my-favourites">My Favourites</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={auth.logout}>
+            {auth.customClaims?.admin && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin-dashboard">Admin Dashboard</Link>
+              </DropdownMenuItem>
+            )}
+            {!auth.customClaims?.admin && (
+              <DropdownMenuItem asChild>
+                <Link href="/account/my-favourites">My Favourites</Link>
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              onClick={async () => {
+                await auth.logout();
+                router.refresh();
+              }}
+            >
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

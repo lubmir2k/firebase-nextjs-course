@@ -10,14 +10,17 @@ import {
 } from "react";
 import {
   User,
+  ParsedToken,
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
+import { setToken, removeToken } from "./actions";
 import { auth } from "@/firebase/client";
 
 type AuthContextType = {
   currentUser: User | null;
+  customClaims: ParsedToken | null;
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
 };
@@ -26,10 +29,27 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [customClaims, setCustomClaims] = useState<ParsedToken | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user ?? null);
+
+      if (user) {
+        const tokenResult = await user.getIdTokenResult();
+        const token = tokenResult.token;
+        const refreshToken = user.refreshToken;
+        const claims = tokenResult.claims;
+
+        setCustomClaims(claims);
+
+        if (token && refreshToken) {
+          await setToken({ token, refreshToken });
+        }
+      } else {
+        setCustomClaims(null);
+        await removeToken();
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -52,8 +72,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const value = useMemo(
-    () => ({ currentUser, logout, loginWithGoogle }),
-    [currentUser, logout, loginWithGoogle]
+    () => ({ currentUser, customClaims, logout, loginWithGoogle }),
+    [currentUser, customClaims, logout, loginWithGoogle]
   );
 
   return (
