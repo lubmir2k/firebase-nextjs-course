@@ -7,12 +7,19 @@ import { z } from "zod";
 type PropertyData = z.infer<typeof propertyDataSchema>;
 
 export const createProperty = async (data: PropertyData, authToken: string) => {
-  const verifiedToken = await auth.verifyIdToken(authToken);
+  try {
+    const verifiedToken = await auth.verifyIdToken(authToken);
 
-  if (!verifiedToken.admin) {
+    if (!verifiedToken.admin) {
+      return {
+        error: true,
+        message: "Unauthorized",
+      };
+    }
+  } catch {
     return {
       error: true,
-      message: "Unauthorized",
+      message: "Authentication failed",
     };
   }
 

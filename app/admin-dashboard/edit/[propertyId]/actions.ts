@@ -5,12 +5,19 @@ import { Property } from "@/types/property";
 import { propertyDataSchema } from "@/validation/propertySchema";
 
 export const updateProperty = async (data: Property, authToken: string) => {
-  const verifiedToken = await auth.verifyIdToken(authToken);
+  try {
+    const verifiedToken = await auth.verifyIdToken(authToken);
 
-  if (!verifiedToken.admin) {
+    if (!verifiedToken.admin) {
+      return {
+        error: true,
+        message: "Unauthorized",
+      };
+    }
+  } catch {
     return {
       error: true,
-      message: "Unauthorized",
+      message: "Authentication failed",
     };
   }
 

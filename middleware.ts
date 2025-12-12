@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { decodeJwt } from "jose";
+import { auth } from "@/firebase/server";
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for server actions (POST requests)
@@ -27,11 +27,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Decode token and check if user is admin
-  const decodedToken = decodeJwt(token);
+  // Verify token and check if user is admin
+  try {
+    const decodedToken = await auth.verifyIdToken(token);
 
-  if (!decodedToken.admin) {
-    return NextResponse.redirect(new URL("/", request.url));
+    if (!decodedToken.admin) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  } catch {
+    // Token is invalid or expired, redirect to homepage and clear cookies
+    const response = NextResponse.redirect(new URL("/", request.url));
+    response.cookies.delete("firebaseAuthToken");
+    response.cookies.delete("firebaseAuthRefreshToken");
+    return response;
   }
 
   // User is authenticated and is admin, allow access

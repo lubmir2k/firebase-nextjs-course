@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import PropertyStatusBadge from "@/components/property-status-badge";
 
+const PAGE_SIZE = 10;
+
 type Props = {
   page?: number;
 };
@@ -22,7 +24,7 @@ export default async function PropertiesTable({ page = 1 }: Props) {
   const { data, totalPages } = await getProperties({
     pagination: {
       page,
-      pageSize: 2,
+      pageSize: PAGE_SIZE,
     },
   });
 
