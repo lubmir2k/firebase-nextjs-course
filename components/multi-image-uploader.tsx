@@ -15,10 +15,24 @@ type Props = {
 };
 
 export default function MultiImageUploader({
-  images,
+  images = [],
   onImagesChange,
 }: Props) {
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    const newImages = files.map((file, index) => {
+      return {
+        id: `${Date.now()}-${index}-${file.name}`,
+        url: URL.createObjectURL(file),
+        file,
+      };
+    });
+
+    onImagesChange([...images, ...newImages]);
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4">
@@ -28,6 +42,7 @@ export default function MultiImageUploader({
         multiple
         accept="image/*"
         className="hidden"
+        onChange={handleInputChange}
       />
       <Button type="button" onClick={() => uploadInputRef.current?.click()}>
         Upload Images
