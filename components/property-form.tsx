@@ -208,6 +208,12 @@ export default function PropertyForm({
                 onImagesChange={(images: ImageUpload[]) => {
                   form.setValue("images", images);
                 }}
+                urlFormatter={(image) => {
+                  if (!image.file) {
+                    return `https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(image.url)}?alt=media`;
+                  }
+                  return image.url;
+                }}
               />
               <FormMessage />
             </FormItem>

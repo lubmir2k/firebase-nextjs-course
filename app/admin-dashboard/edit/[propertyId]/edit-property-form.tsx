@@ -19,6 +19,7 @@ type Props = {
 export default function EditPropertyForm({ property }: Props) {
   const auth = useAuth();
   const router = useRouter();
+  const { images, ...propertyData } = property;
 
   const handleSubmit = async (data: PropertyData) => {
     const token = await auth?.currentUser?.getIdToken();
@@ -51,7 +52,15 @@ export default function EditPropertyForm({ property }: Props) {
           <SaveIcon /> Save Property
         </>
       }
-      defaultValues={property}
+      defaultValues={{
+        ...propertyData,
+        images: images
+          ? images.map((image) => ({
+              id: image,
+              url: image,
+            }))
+          : [],
+      }}
     />
   );
 }
