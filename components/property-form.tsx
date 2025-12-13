@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import MultiImageUploader from "./multi-image-uploader";
 
 type PropertyData = z.infer<typeof propertyDataSchema>;
 
@@ -195,6 +196,8 @@ export default function PropertyForm({
             />
           </fieldset>
         </div>
+
+        <MultiImageUploader onImagesChange={() => {}} />
 
         <Button type="submit" className="max-w-md mx-auto mt-2 w-full flex gap-2" disabled={form.formState.isSubmitting}>
           {submitButtonLabel}
