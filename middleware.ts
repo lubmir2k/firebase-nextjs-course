@@ -34,11 +34,16 @@ export async function middleware(request: NextRequest) {
   try {
     const decodedToken = decodeJwt(token);
 
+    // Manually check for token expiration, as decodeJwt doesn't validate it.
+    if (decodedToken.exp && decodedToken.exp * 1000 < Date.now()) {
+      throw new Error("Token expired");
+    }
+
     if (!decodedToken.admin) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   } catch {
-    // Token is malformed, redirect to homepage and clear cookies
+    // Token is malformed or expired, redirect to homepage and clear cookies
     const response = NextResponse.redirect(new URL("/", request.url));
     response.cookies.delete("firebaseAuthToken");
     response.cookies.delete("firebaseAuthRefreshToken");
