@@ -1,0 +1,37 @@
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPropertyById } from "@/data/properties";
+import EditPropertyForm from "./edit-property-form";
+
+type Params = {
+  params: Promise<{ propertyId: string }>;
+};
+
+export default async function EditProperty({ params }: Params) {
+  const paramsValue = await params;
+  const property = await getPropertyById(paramsValue.propertyId);
+
+  return (
+    <div>
+      <Breadcrumbs
+        items={[
+          {
+            href: "/admin-dashboard",
+            label: "Dashboard",
+          },
+          {
+            label: "Edit Property",
+          },
+        ]}
+      />
+      <Card className="mt-5">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold">Edit Property</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EditPropertyForm property={property} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
