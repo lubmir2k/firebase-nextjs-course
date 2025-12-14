@@ -1,10 +1,18 @@
 import { getPropertyById } from "@/data/properties";
-import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, BedIcon, BathIcon } from "lucide-react";
+import { BedIcon, BathIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import PropertyStatusBadge from "@/components/property-status-badge";
 import numeral from "numeral";
+import Image from "next/image";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import BackButton from "./back-button";
 
 type Props = {
   params: Promise<{ propertyId: string }>;
@@ -28,11 +36,32 @@ export default async function Property({ params }: Props) {
   return (
     <div className="grid grid-cols-[1fr_500px]">
       <div>
-        <div>carousel</div>
+        {property.images && (
+          <Carousel className="w-full">
+            <CarouselContent>
+              {property.images.map((image, index) => (
+                <CarouselItem key={image}>
+                  <div className="relative h-[80vh] min-h-80">
+                    <Image
+                      src={`https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(image)}?alt=media`}
+                      alt={`Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {property.images.length > 1 && (
+              <>
+                <CarouselPrevious className="translate-x-24 size-12" />
+                <CarouselNext className="-translate-x-24 size-12" />
+              </>
+            )}
+          </Carousel>
+        )}
         <div className="property-description max-w-screen-md mx-auto py-10 px-4">
-          <Button>
-            <ArrowLeftIcon /> Back
-          </Button>
+          <BackButton />
           <ReactMarkdown>{property.description}</ReactMarkdown>
         </div>
       </div>
