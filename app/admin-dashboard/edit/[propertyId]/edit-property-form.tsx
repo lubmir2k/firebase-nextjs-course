@@ -63,10 +63,10 @@ export default function EditPropertyForm({ property }: Props) {
     // Handle new image uploads and existing images
     const paths: string[] = [];
 
-    newImages?.forEach((image, index) => {
+    newImages?.forEach((image) => {
       if (image.file) {
         // New image to upload
-        const path = `properties/${id}/${Date.now()}-${index}-${image.file.name}`;
+        const path = `properties/${id}/${crypto.randomUUID()}-${image.file.name}`;
         paths.push(path);
 
         const storageRef = ref(storage, path);

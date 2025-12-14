@@ -34,9 +34,9 @@ export default function MultiImageUploader({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
-    const newImages = files.map((file, index) => {
+    const newImages = files.map((file) => {
       return {
-        id: `${Date.now()}-${index}-${file.name}`,
+        id: crypto.randomUUID(),
         url: URL.createObjectURL(file),
         file,
       };
@@ -98,7 +98,7 @@ export default function MultiImageUploader({
                         <div className="size-16 relative rounded-lg overflow-hidden">
                           <Image
                             src={urlFormatter ? urlFormatter(image) : image.url}
-                            alt=""
+                            alt={`Preview of image ${index + 1}`}
                             fill
                             className="object-cover"
                           />
@@ -115,6 +115,7 @@ export default function MultiImageUploader({
                           <button
                             type="button"
                             className="p-2 text-red-500"
+                            aria-label={`Delete image ${index + 1}`}
                             onClick={() => handleDelete(image.id)}
                           >
                             <X />

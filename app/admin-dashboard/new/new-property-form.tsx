@@ -47,9 +47,9 @@ export default function NewPropertyForm() {
     const uploadTasks: UploadTask[] = [];
     const paths: string[] = [];
 
-    images?.forEach((image, index) => {
+    images?.forEach((image) => {
       if (image.file) {
-        const path = `properties/${response.propertyId}/${Date.now()}-${index}-${image.file.name}`;
+        const path = `properties/${response.propertyId}/${crypto.randomUUID()}-${image.file.name}`;
         paths.push(path);
 
         const storageRef = ref(storage, path);
