@@ -60,6 +60,11 @@ export default async function PropertySearch({ searchParams }: Props) {
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-5 mt-5">
+        {data.length === 0 && (
+          <p className="col-span-3 text-center text-muted-foreground py-10">
+            No properties found matching your criteria.
+          </p>
+        )}
         {data.map((property) => {
           const addressLines = [
             property.address1,
@@ -79,7 +84,7 @@ export default async function PropertySearch({ searchParams }: Props) {
                       fill
                       className="object-cover"
                       src={imageUrlFormatter(property.images[0])}
-                      alt=""
+                      alt={`Property at ${addressLines}`}
                     />
                   </div>
                 )}
