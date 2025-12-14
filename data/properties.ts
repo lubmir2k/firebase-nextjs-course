@@ -49,10 +49,15 @@ export const getProperties = async (options?: GetPropertiesOptions) => {
     .offset((page - 1) * pageSize)
     .get();
 
-  const properties = propertiesSnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  } as Property));
+  const properties = propertiesSnapshot.docs.map((doc) => {
+    const { created, updated, ...rest } = doc.data();
+    return {
+      id: doc.id,
+      ...rest,
+      created: created?.toDate().toISOString(),
+      updated: updated?.toDate().toISOString(),
+    } as Property;
+  });
 
   return { data: properties, totalPages };
 };
@@ -63,10 +68,17 @@ export const getPropertyById = async (propertyId: string) => {
     .doc(propertyId)
     .get();
 
-  const propertyData = {
-    id: propertySnapshot.id,
-    ...propertySnapshot.data(),
-  } as Property;
+  const data = propertySnapshot.data();
 
-  return propertyData;
+  if (!data) {
+    return null;
+  }
+
+  const { created, updated, ...rest } = data;
+  return {
+    id: propertySnapshot.id,
+    ...rest,
+    created: created?.toDate().toISOString(),
+    updated: updated?.toDate().toISOString(),
+  } as Property;
 };

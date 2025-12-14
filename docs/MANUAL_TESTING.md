@@ -33,8 +33,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | AUTH-006 | View user info in dropdown | 1. Login<br>2. Click avatar | Dropdown shows:<br>- User display name<br>- User email |
-| AUTH-007 | Admin sees Admin Dashboard link | 1. Login with admin account<br>2. Click avatar | - "Admin Dashboard" link visible<br>- "My Favourites" NOT visible |
-| AUTH-008 | Non-admin sees My Favourites link | 1. Login with non-admin account<br>2. Click avatar | - "My Favourites" link visible<br>- "Admin Dashboard" NOT visible |
+| AUTH-007 | Admin sees Admin Dashboard link | 1. Login with admin account<br>2. Click avatar | "Admin Dashboard" link visible |
 
 ---
 
@@ -81,8 +80,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | TABLE-005 | Status badge - Draft | 1. View property with "draft" status | Gray/secondary badge with "Draft" text |
 | TABLE-006 | Status badge - Withdrawn | 1. View property with "withdrawn" status | Red/destructive badge with "Withdrawn" text |
 | TABLE-007 | Status badge - Sold | 1. View property with "sold" status | Green/success badge with "Sold" text |
-| TABLE-008 | View button | 1. Click eye icon on property row | Navigates to `/property/[id]` (may show 404 - not implemented yet) |
-| TABLE-009 | Edit button | 1. Click pencil icon on property row | Navigates to `/admin-dashboard/edit/[id]` |
+| TABLE-008 | Edit button | 1. Click pencil icon on property row | Navigates to `/admin-dashboard/edit/[id]` |
 
 ### 3.3 Pagination
 
@@ -236,7 +234,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | IMG-032 | Storage folder structure | 1. Upload images to property<br>2. Check Storage | Files in `properties/{propertyId}/` |
-| IMG-033 | File naming | 1. Upload image<br>2. Check Storage | Filename: `{timestamp}-{index}-{originalName}` |
+| IMG-033 | File naming | 1. Upload image<br>2. Check Storage | Filename: `{uuid}-{originalName}` |
 | IMG-034 | File deletion | 1. Delete image from property<br>2. Check Storage | File no longer exists in Storage bucket |
 | IMG-035 | Multiple properties isolation | 1. Create 2 properties with images | Each property has separate folder in Storage |
 
@@ -250,9 +248,8 @@ This document provides test cases for all implemented functionality in the Fire 
 |---------|-----------|-------|-----------------|
 | NAV-001 | Logo displays | 1. View any page | "Fire Homes" text with home icon |
 | NAV-002 | Logo navigation | 1. Click logo | Navigates to homepage |
-| NAV-003 | Property Search link | 1. View navbar | "Property Search" link visible |
-| NAV-004 | Logged out state | 1. Logout<br>2. View navbar | Shows "Login" and "Sign Up" links with vertical separator |
-| NAV-005 | Logged in state | 1. Login<br>2. View navbar | User avatar replaces login/signup links |
+| NAV-003 | Logged out state | 1. Logout<br>2. View navbar | Shows "Login" and "Sign Up" links with vertical separator |
+| NAV-004 | Logged in state | 1. Login<br>2. View navbar | User avatar replaces login/signup links |
 
 ### 7.2 Toast Notifications
 

@@ -12,4 +12,6 @@ export type Property = {
   description: string;
   status: PropertyStatus;
   images?: string[];
+  created?: string;
+  updated?: string;
 };
