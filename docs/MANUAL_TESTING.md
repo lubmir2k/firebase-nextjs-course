@@ -236,7 +236,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | IMG-032 | Storage folder structure | 1. Upload images to property<br>2. Check Storage | Files in `properties/{propertyId}/` |
-| IMG-033 | File naming | 1. Upload image<br>2. Check Storage | Filename: `{timestamp}-{index}-{originalName}` |
+| IMG-033 | File naming | 1. Upload image<br>2. Check Storage | Filename: `{uuid}-{originalName}` |
 | IMG-034 | File deletion | 1. Delete image from property<br>2. Check Storage | File no longer exists in Storage bucket |
 | IMG-035 | Multiple properties isolation | 1. Create 2 properties with images | Each property has separate folder in Storage |
 
