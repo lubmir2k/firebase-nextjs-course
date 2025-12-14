@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPropertyById } from "@/data/properties";
+import { notFound } from "next/navigation";
 import EditPropertyForm from "./edit-property-form";
 
 type Params = {
@@ -10,6 +11,10 @@ type Params = {
 export default async function EditProperty({ params }: Params) {
   const paramsValue = await params;
   const property = await getPropertyById(paramsValue.propertyId);
+
+  if (!property) {
+    notFound();
+  }
 
   return (
     <div>

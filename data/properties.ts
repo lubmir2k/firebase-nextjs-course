@@ -49,10 +49,24 @@ export const getProperties = async (options?: GetPropertiesOptions) => {
     .offset((page - 1) * pageSize)
     .get();
 
-  const properties = propertiesSnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  } as Property));
+  const properties = propertiesSnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      address1: data.address1,
+      address2: data.address2,
+      city: data.city,
+      postcode: data.postcode,
+      price: data.price,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      description: data.description,
+      status: data.status,
+      images: data.images,
+      created: data.created?.toDate().toISOString(),
+      updated: data.updated?.toDate().toISOString(),
+    } as Property;
+  });
 
   return { data: properties, totalPages };
 };
@@ -63,10 +77,27 @@ export const getPropertyById = async (propertyId: string) => {
     .doc(propertyId)
     .get();
 
-  const propertyData = {
-    id: propertySnapshot.id,
-    ...propertySnapshot.data(),
-  } as Property;
+  const data = propertySnapshot.data();
 
-  return propertyData;
+  if (!data) {
+    return null;
+  }
+
+  const property: Property = {
+    id: propertySnapshot.id,
+    address1: data.address1,
+    address2: data.address2,
+    city: data.city,
+    postcode: data.postcode,
+    price: data.price,
+    bedrooms: data.bedrooms,
+    bathrooms: data.bathrooms,
+    description: data.description,
+    status: data.status,
+    images: data.images,
+    created: data.created?.toDate().toISOString(),
+    updated: data.updated?.toDate().toISOString(),
+  };
+
+  return property;
 };
