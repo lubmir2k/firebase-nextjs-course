@@ -18,11 +18,16 @@ const variant: Record<
   sold: "success",
 };
 
-export default function PropertyStatusBadge({
-  status,
-}: {
+type Props = {
   status: PropertyStatus;
-}) {
+  className?: string;
+};
+
+export default function PropertyStatusBadge({ status, className }: Props) {
   const label = statusLabel[status];
-  return <Badge variant={variant[status]}>{label}</Badge>;
+  return (
+    <Badge variant={variant[status]} className={className}>
+      {label}
+    </Badge>
+  );
 }
