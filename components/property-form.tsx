@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { propertyDataSchema } from "@/validation/propertySchema";
+import { propertySchema } from "@/validation/propertySchema";
 import {
   Form,
   FormControl,
@@ -22,13 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import MultiImageUploader, { ImageUpload } from "./multi-image-uploader";
 
-type PropertyData = z.infer<typeof propertyDataSchema>;
+type PropertyData = z.infer<typeof propertySchema>;
 
 type Props = {
   handleSubmit: (data: PropertyData) => void;
   submitButtonLabel?: React.ReactNode;
-  defaultValues?: PropertyData;
+  defaultValues?: Partial<PropertyData>;
 };
 
 const hardcodedDefaultValues: PropertyData = {
@@ -41,6 +42,7 @@ const hardcodedDefaultValues: PropertyData = {
   bedrooms: 0,
   bathrooms: 0,
   status: "draft",
+  images: [],
 };
 
 export default function PropertyForm({
@@ -54,7 +56,7 @@ export default function PropertyForm({
   };
 
   const form = useForm<PropertyData>({
-    resolver: zodResolver(propertyDataSchema) as any,
+    resolver: zodResolver(propertySchema) as any,
     defaultValues: combinedDefaultValues,
   });
 
@@ -195,6 +197,28 @@ export default function PropertyForm({
             />
           </fieldset>
         </div>
+
+        <FormField
+          control={form.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <MultiImageUploader
+                images={field.value}
+                onImagesChange={(images: ImageUpload[]) => {
+                  form.setValue("images", images);
+                }}
+                urlFormatter={(image) => {
+                  if (!image.file) {
+                    return `https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(image.url)}?alt=media`;
+                  }
+                  return image.url;
+                }}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" className="max-w-md mx-auto mt-2 w-full flex gap-2" disabled={form.formState.isSubmitting}>
           {submitButtonLabel}

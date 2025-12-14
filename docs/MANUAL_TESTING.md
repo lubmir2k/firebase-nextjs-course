@@ -168,9 +168,83 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 6. UI Components
+## 6. Image Upload
 
-### 6.1 Navbar
+### 6.1 Upload Button and File Selection
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-001 | Upload button displays | 1. Navigate to new/edit property form | "Upload Images" button visible with full width, outline style |
+| IMG-002 | File picker opens | 1. Click "Upload Images" button | Native OS file picker opens |
+| IMG-003 | Select single image | 1. Click "Upload Images"<br>2. Select one image file<br>3. Click Open | Image appears in list below button |
+| IMG-004 | Select multiple images | 1. Click "Upload Images"<br>2. Select multiple image files<br>3. Click Open | All selected images appear in list |
+| IMG-005 | File type restriction | 1. Click "Upload Images"<br>2. Try to select non-image file | File picker only shows image files (image/*) |
+| IMG-006 | Cancel file picker | 1. Click "Upload Images"<br>2. Close file picker without selecting | No changes to image list |
+
+### 6.2 Image List Display
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-007 | Image thumbnail | 1. Upload an image | 64x64px thumbnail displays with object-cover |
+| IMG-008 | Image label | 1. Upload multiple images | Labels show "Image 1", "Image 2", etc. |
+| IMG-009 | Featured image badge | 1. Upload images | First image shows green "Featured Image" badge |
+| IMG-010 | Delete button | 1. View uploaded image | Red X button visible on each image row |
+| IMG-011 | Move handle | 1. View uploaded image | Gray move icon visible on each image row |
+| IMG-012 | Gray background styling | 1. View image list | Each row has light gray background with rounded corners |
+
+### 6.3 Image Deletion
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-013 | Delete image from list | 1. Upload images<br>2. Click X button on an image | Image removed from list immediately |
+| IMG-014 | Delete updates numbering | 1. Upload 3 images<br>2. Delete "Image 2" | Remaining images renumber to "Image 1", "Image 2" |
+| IMG-015 | Delete featured image | 1. Upload images<br>2. Delete first image | Second image becomes "Image 1" with Featured badge |
+| IMG-016 | Delete all images | 1. Upload images<br>2. Delete all one by one | Image list empty, only "Upload Images" button visible |
+
+### 6.4 Drag and Drop Reordering
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-017 | Drag image down | 1. Upload 3+ images<br>2. Drag "Image 1" to position 3 | Image moves to new position, labels update |
+| IMG-018 | Drag image up | 1. Upload 3+ images<br>2. Drag "Image 3" to position 1 | Image moves to new position, becomes Featured |
+| IMG-019 | Featured badge updates | 1. Upload images<br>2. Drag Image 2 to position 1 | Dragged image gets Featured badge, original loses it |
+| IMG-020 | Drag outside list | 1. Start dragging image<br>2. Drop outside the list area | Image returns to original position |
+| IMG-021 | List height maintained | 1. Start dragging an image | List maintains height (no jumping), placeholder visible |
+
+### 6.5 New Property with Images
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-022 | Create with images | 1. Fill property form<br>2. Upload 3 images<br>3. Click "Create Property" | - Success toast<br>- Redirected to dashboard |
+| IMG-023 | Verify Storage upload | 1. Create property with images<br>2. Check Firebase Storage | Images exist in `properties/{propertyId}/` folder |
+| IMG-024 | Verify Firestore paths | 1. Create property with images<br>2. Check Firestore document | `images` array contains paths to uploaded files |
+| IMG-025 | Create without images | 1. Fill property form (no images)<br>2. Submit | Property created successfully, no images field or empty array |
+
+### 6.6 Edit Property - Existing Images
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-026 | Load existing images | 1. Edit property with uploaded images | All images display with thumbnails from Firebase Storage |
+| IMG-027 | Existing image thumbnails | 1. Edit property with images | Thumbnails load from firebasestorage.googleapis.com |
+| IMG-028 | Add to existing images | 1. Edit property with 2 images<br>2. Upload 1 more image<br>3. Save | Property now has 3 images |
+| IMG-029 | Delete existing image | 1. Edit property with images<br>2. Delete one image<br>3. Save | - Image removed from Firestore array<br>- File deleted from Storage |
+| IMG-030 | Reorder existing images | 1. Edit property with images<br>2. Reorder via drag<br>3. Save | New order persisted in Firestore |
+| IMG-031 | Mixed operations | 1. Edit property<br>2. Delete one image<br>3. Add new image<br>4. Reorder<br>5. Save | All changes persist correctly |
+
+### 6.7 Firebase Storage Verification
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| IMG-032 | Storage folder structure | 1. Upload images to property<br>2. Check Storage | Files in `properties/{propertyId}/` |
+| IMG-033 | File naming | 1. Upload image<br>2. Check Storage | Filename: `{timestamp}-{index}-{originalName}` |
+| IMG-034 | File deletion | 1. Delete image from property<br>2. Check Storage | File no longer exists in Storage bucket |
+| IMG-035 | Multiple properties isolation | 1. Create 2 properties with images | Each property has separate folder in Storage |
+
+---
+
+## 7. UI Components
+
+### 7.1 Navbar
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -180,7 +254,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | NAV-004 | Logged out state | 1. Logout<br>2. View navbar | Shows "Login" and "Sign Up" links with vertical separator |
 | NAV-005 | Logged in state | 1. Login<br>2. View navbar | User avatar replaces login/signup links |
 
-### 6.2 Toast Notifications
+### 7.2 Toast Notifications
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -188,14 +262,14 @@ This document provides test cases for all implemented functionality in the Fire 
 | TOAST-002 | Toast close button | 1. Trigger toast<br>2. Click X button | Toast closes immediately |
 | TOAST-003 | Toast auto-dismiss | 1. Trigger toast<br>2. Wait | Toast auto-dismisses after a few seconds |
 
-### 6.3 Cards
+### 7.3 Cards
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | CARD-001 | Login card | 1. View `/login` | Card with header "Login" and Google button |
 | CARD-002 | Property form cards | 1. View new/edit property pages | Card with appropriate title and form content |
 
-### 6.4 Buttons
+### 7.4 Buttons
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -205,9 +279,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 7. Server Actions Security
+## 8. Server Actions Security
 
-### 7.1 Authentication Checks
+### 8.1 Authentication Checks
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -217,7 +291,7 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 8. Cross-Browser Testing
+## 9. Cross-Browser Testing
 
 | Test ID | Browser | Test Case | Expected Result |
 |---------|---------|-----------|-----------------|
@@ -228,7 +302,7 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 9. Responsive Testing
+## 10. Responsive Testing
 
 | Test ID | Viewport | Test Case | Expected Result |
 |---------|----------|-----------|-----------------|
