@@ -50,21 +50,12 @@ export const getProperties = async (options?: GetPropertiesOptions) => {
     .get();
 
   const properties = propertiesSnapshot.docs.map((doc) => {
-    const data = doc.data();
+    const { created, updated, ...rest } = doc.data();
     return {
       id: doc.id,
-      address1: data.address1,
-      address2: data.address2,
-      city: data.city,
-      postcode: data.postcode,
-      price: data.price,
-      bedrooms: data.bedrooms,
-      bathrooms: data.bathrooms,
-      description: data.description,
-      status: data.status,
-      images: data.images,
-      created: data.created?.toDate().toISOString(),
-      updated: data.updated?.toDate().toISOString(),
+      ...rest,
+      created: created?.toDate().toISOString(),
+      updated: updated?.toDate().toISOString(),
     } as Property;
   });
 
@@ -83,21 +74,11 @@ export const getPropertyById = async (propertyId: string) => {
     return null;
   }
 
-  const property: Property = {
+  const { created, updated, ...rest } = data;
+  return {
     id: propertySnapshot.id,
-    address1: data.address1,
-    address2: data.address2,
-    city: data.city,
-    postcode: data.postcode,
-    price: data.price,
-    bedrooms: data.bedrooms,
-    bathrooms: data.bathrooms,
-    description: data.description,
-    status: data.status,
-    images: data.images,
-    created: data.created?.toDate().toISOString(),
-    updated: data.updated?.toDate().toISOString(),
-  };
-
-  return property;
+    ...rest,
+    created: created?.toDate().toISOString(),
+    updated: updated?.toDate().toISOString(),
+  } as Property;
 };
