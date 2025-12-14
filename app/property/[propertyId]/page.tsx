@@ -44,7 +44,7 @@ export default async function Property({ params }: Props) {
                   <div className="relative h-[80vh] min-h-80">
                     <Image
                       src={`https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(image)}?alt=media`}
-                      alt={`Image ${index + 1}`}
+                      alt={`Property at ${property.address1}, image ${index + 1}`}
                       fill
                       className="object-cover"
                     />
