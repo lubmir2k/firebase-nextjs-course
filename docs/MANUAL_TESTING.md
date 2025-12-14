@@ -309,6 +309,60 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
+## 11. Property Search
+
+### 11.1 Search Page Access
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-001 | Access search page | Navigate to `/property-search` | Page loads with "Property Search" title and Filters card |
+| SEARCH-002 | Filters form displays | View search page | Form shows Min price, Max price, Min bedrooms inputs with labels and Search button |
+
+### 11.2 Search Filters
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-003 | Filter by min price | 1. Enter 200000 in Min price<br>2. Click Search | URL updates with `minPrice=200000`, only properties >= £200,000 shown |
+| SEARCH-004 | Filter by max price | 1. Enter 500000 in Max price<br>2. Click Search | URL updates with `maxPrice=500000`, only properties <= £500,000 shown |
+| SEARCH-005 | Filter by min bedrooms | 1. Enter 3 in Min bedrooms<br>2. Click Search | URL updates with `minBedrooms=3`, only properties with 3+ bedrooms shown |
+| SEARCH-006 | Multiple filters | 1. Enter min price 100000<br>2. Enter max price 300000<br>3. Enter min bedrooms 2<br>4. Click Search | All filters applied, URL contains all params |
+| SEARCH-007 | Clear filters | 1. Apply filters<br>2. Clear all inputs<br>3. Click Search | URL has only `page=1`, all for-sale properties shown |
+| SEARCH-008 | Filter persistence on refresh | 1. Apply filters<br>2. Refresh page (F5) | Form inputs retain filter values from URL |
+
+### 11.3 Property Results Grid
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-009 | Grid layout | View results with multiple properties | Properties displayed in 3-column grid |
+| SEARCH-010 | Property card with image | View property that has images | Card shows thumbnail image with rounded corners |
+| SEARCH-011 | Property card placeholder | View property without images | Card shows HomeIcon with "No Image" text on sky-blue background |
+| SEARCH-012 | Property card details | View any property card | Shows: address, bed count with icon, bath count with icon, formatted price |
+| SEARCH-013 | Price formatting | View property with price 250000 | Displays as "£250,000" with comma separator |
+| SEARCH-014 | View Property button | Click "View Property" on any card | Navigates to `/property/[propertyId]` detail page |
+| SEARCH-015 | Empty results | Apply filters that match no properties (e.g., min price 99999999) | Shows "No properties found matching your criteria." message |
+| SEARCH-016 | Image alt text | Right-click image > Inspect | Alt attribute contains property address |
+
+### 11.4 Pagination
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-017 | Pagination buttons display | Have more than 3 for-sale properties | Numbered page buttons appear below grid |
+| SEARCH-018 | Current page disabled | View page 1 (default) | Page 1 button is disabled |
+| SEARCH-019 | Navigate to page 2 | Click page 2 button | URL updates to `page=2`, page 2 results shown, page 2 button disabled |
+| SEARCH-020 | Filters persist with pagination | 1. Apply min price filter<br>2. Click page 2 | URL contains both `minPrice` and `page=2` params |
+| SEARCH-021 | Direct URL pagination | Navigate to `/property-search?page=2` | Page 2 results display directly |
+| SEARCH-022 | Page size | Count results on a full page | Maximum 3 properties per page |
+
+### 11.5 Firestore Indexes
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-023 | Query with filters works | Apply various filter combinations | No console errors about missing indexes |
+
+> **Note for testers:** If you see Firestore index errors in the console, you need to create composite indexes. Click the link in the error message to create the index in Firebase Console. Required indexes include combinations of `status`, `listingPrice`, and `bedrooms` fields.
+
+---
+
 ## Test Data
 
 ### Valid Test Property
