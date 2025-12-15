@@ -31,6 +31,12 @@ export const GET = async (request: NextRequest) => {
     );
 
     const json = await response.json();
+
+    if (!response.ok) {
+      console.error("Failed to refresh token:", json);
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
     const newAuthToken = json.id_token;
     const newRefreshToken = json.refresh_token;
 
@@ -46,7 +52,7 @@ export const GET = async (request: NextRequest) => {
 
     return NextResponse.redirect(new URL(path, request.url));
   } catch (e) {
-    console.log("Failed to refresh token", e);
+    console.error("Failed to refresh token", e);
     return NextResponse.redirect(new URL("/", request.url));
   }
 };
