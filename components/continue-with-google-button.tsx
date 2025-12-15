@@ -9,12 +9,16 @@ export default function ContinueWithGoogleButton() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    await auth.loginWithGoogle();
-    router.refresh();
+    try {
+      await auth.loginWithGoogle();
+      router.refresh();
+    } catch {
+      // User closed the popup - no action needed
+    }
   };
 
   return (
-    <Button className="w-full" onClick={handleLogin}>
+    <Button variant="outline" className="w-full" onClick={handleLogin}>
       Continue with Google
     </Button>
   );

@@ -14,6 +14,7 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { setToken, removeToken } from "./actions";
 import { auth } from "@/firebase/client";
@@ -23,6 +24,7 @@ type AuthContextType = {
   customClaims: ParsedToken | null;
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -71,9 +73,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const loginWithEmail = useCallback(
+    async (email: string, password: string) => {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        console.error("Error signing in with email:", error);
+      }
+    },
+    []
+  );
+
   const value = useMemo(
-    () => ({ currentUser, customClaims, logout, loginWithGoogle }),
-    [currentUser, customClaims, logout, loginWithGoogle]
+    () => ({ currentUser, customClaims, logout, loginWithGoogle, loginWithEmail }),
+    [currentUser, customClaims, logout, loginWithGoogle, loginWithEmail]
   );
 
   return (
