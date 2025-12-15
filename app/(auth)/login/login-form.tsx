@@ -15,13 +15,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { passwordValidation } from "@/validation/registerUser";
 import { useAuth } from "@/context/auth";
 import ContinueWithGoogleButton from "@/components/continue-with-google-button";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: passwordValidation,
+  password: z.string().min(1, { message: "Password is required." }),
 });
 
 export default function LoginForm() {
@@ -41,12 +40,12 @@ export default function LoginForm() {
       await auth.loginWithEmail(data.email, data.password);
       router.refresh();
     } catch (e: unknown) {
-      const error = e as { code?: string };
+      const isInvalidCredential =
+        e instanceof Object && "code" in e && e.code === "auth/invalid-credential";
       toast.error("Error", {
-        description:
-          error.code === "auth/invalid-credential"
-            ? "Incorrect credentials"
-            : "An error occurred",
+        description: isInvalidCredential
+          ? "Incorrect credentials"
+          : "An error occurred",
       });
     }
   };

@@ -34,7 +34,10 @@ export const GET = async (request: NextRequest) => {
 
     if (!response.ok) {
       console.error("Failed to refresh token:", json);
-      return NextResponse.redirect(new URL("/", request.url));
+      const res = NextResponse.redirect(new URL("/", request.url));
+      res.cookies.delete("firebaseAuthToken");
+      res.cookies.delete("firebaseAuthRefreshToken");
+      return res;
     }
 
     const newAuthToken = json.id_token;

@@ -29,10 +29,10 @@ export const registerUser = async (data: {
 
     return { error: false, message: "User registered" };
   } catch (e: unknown) {
-    const error = e as { message?: string };
+    const message = e instanceof Error ? e.message : "Could not register user";
     return {
       error: true,
-      message: error.message ?? "Could not register user",
+      message,
     };
   }
 };
