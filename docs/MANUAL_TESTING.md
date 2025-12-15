@@ -35,6 +35,24 @@ This document provides test cases for all implemented functionality in the Fire 
 | AUTH-006 | View user info in dropdown | 1. Login<br>2. Click avatar | Dropdown shows:<br>- User display name<br>- User email |
 | AUTH-007 | Admin sees Admin Dashboard link | 1. Login with admin account<br>2. Click avatar | "Admin Dashboard" link visible |
 
+### 1.4 Token Refresh
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| AUTH-008 | Token refresh on expiring token | 1. Login as admin<br>2. Wait until token is within 5 minutes of expiry (or manually edit cookie expiry in dev tools)<br>3. Navigate to `/admin-dashboard` | - Redirected to `/api/refresh-token?redirect=/admin-dashboard`<br>- New token obtained silently<br>- Redirected back to `/admin-dashboard` |
+| AUTH-009 | Refresh with invalid refresh token | 1. Login as admin<br>2. Manually delete or corrupt `firebaseAuthRefreshToken` cookie in dev tools<br>3. Set `firebaseAuthToken` to an expired token<br>4. Navigate to `/admin-dashboard` | Redirected to homepage |
+| AUTH-010 | Refresh preserves redirect path | 1. Login as admin<br>2. Set token to near-expiry<br>3. Navigate to `/admin-dashboard/edit/[property-id]` | After refresh, redirected to the same edit page (not homepage or dashboard) |
+| AUTH-011 | Refresh without redirect param | 1. Directly navigate to `/api/refresh-token` (no redirect param) | Redirected to homepage |
+| AUTH-012 | Expired token without refresh token | 1. Delete `firebaseAuthRefreshToken` cookie<br>2. Wait for `firebaseAuthToken` to expire<br>3. Navigate to protected route | - Both cookies deleted<br>- Redirected to homepage |
+| AUTH-013 | Cookies updated after refresh | 1. Trigger token refresh (token near expiry)<br>2. Check cookies in dev tools after redirect | Both `firebaseAuthToken` and `firebaseAuthRefreshToken` have new values |
+
+> **Testing Tip:** To test token refresh without waiting, you can use browser dev tools:
+> 1. Open Application > Cookies
+> 2. Decode the `firebaseAuthToken` JWT at [jwt.io](https://jwt.io)
+> 3. Note the `exp` claim (expiration timestamp)
+> 4. The middleware triggers refresh when token expires within 300 seconds (5 minutes)
+> 5. Alternatively, create a test endpoint that issues short-lived tokens for testing
+
 ---
 
 ## 2. Route Protection
