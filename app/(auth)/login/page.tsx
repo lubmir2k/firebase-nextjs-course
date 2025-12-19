@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import LoginForm from "./login-form";
+import LoginForm from "@/components/login-form";
 
 export default function Login() {
   return (

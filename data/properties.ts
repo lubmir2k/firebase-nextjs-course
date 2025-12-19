@@ -62,6 +62,25 @@ export const getProperties = async (options?: GetPropertiesOptions) => {
   return { data: properties, totalPages };
 };
 
+export const getPropertiesById = async (propertyIds: string[]) => {
+  if (propertyIds.length === 0) return [];
+
+  const propertiesSnapshot = await firestore
+    .collection("properties")
+    .where("__name__", "in", propertyIds)
+    .get();
+
+  return propertiesSnapshot.docs.map((doc) => {
+    const { created, updated, ...rest } = doc.data();
+    return {
+      id: doc.id,
+      ...rest,
+      created: created?.toDate().toISOString(),
+      updated: updated?.toDate().toISOString(),
+    } as Property;
+  });
+};
+
 export const getPropertyById = async (propertyId: string) => {
   const propertySnapshot = await firestore
     .collection("properties")

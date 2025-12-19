@@ -12,11 +12,12 @@ export async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("firebaseAuthToken")?.value;
 
-  // Allow non-logged-in users to access login/register pages
+  // Allow non-logged-in users to access login/register/property-search pages
   if (
     !token &&
     (request.nextUrl.pathname.startsWith("/login") ||
-      request.nextUrl.pathname.startsWith("/register"))
+      request.nextUrl.pathname.startsWith("/register") ||
+      request.nextUrl.pathname.startsWith("/property-search"))
   ) {
     return NextResponse.next();
   }
@@ -60,7 +61,19 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    if (!decodedToken.admin) {
+    // Only require admin for /admin-dashboard routes
+    if (
+      !decodedToken.admin &&
+      request.nextUrl.pathname.startsWith("/admin-dashboard")
+    ) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // Redirect admins away from /account/my-favourites (favorites is for regular users)
+    if (
+      decodedToken.admin &&
+      request.nextUrl.pathname.startsWith("/account/my-favourites")
+    ) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   } catch {
@@ -77,5 +90,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin-dashboard", "/admin-dashboard/:path*", "/login", "/register"],
+  matcher: [
+    "/admin-dashboard",
+    "/admin-dashboard/:path*",
+    "/login",
+    "/register",
+    "/account",
+    "/account/:path*",
+    "/property-search",
+  ],
 };
