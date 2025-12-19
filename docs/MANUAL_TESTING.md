@@ -381,6 +381,69 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
+## 12. Property Favorites
+
+### 12.1 Toggle Favourite Button
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-001 | Favourite button displays | 1. Navigate to `/property-search`<br>2. View property card | Heart icon button visible in top-right corner of card |
+| FAV-002 | Add to favourites | 1. Login as non-admin<br>2. Click heart on unfavourited property | - Heart fills with pink color<br>- Success toast: "Property added to favourites" |
+| FAV-003 | Remove from favourites | 1. Click heart on favourited property | - Heart becomes white/unfilled<br>- Success toast: "Property removed from favourites" |
+| FAV-004 | Favourite state persists | 1. Add property to favourites<br>2. Refresh page | Heart remains filled for favourited property |
+| FAV-005 | Admin cannot see favourites | 1. Login as admin<br>2. Navigate to `/property-search` | Heart buttons are NOT visible on property cards |
+
+### 12.2 Login Modal
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-006 | Modal appears for logged out user | 1. Logout<br>2. Navigate to `/property-search`<br>3. Click heart on any property | Login modal dialog appears over property search page |
+| FAV-007 | Modal title and description | 1. Trigger login modal | - Title: "Login"<br>- Description: "You must be logged in to favorite a property." |
+| FAV-008 | Modal has login form | 1. View login modal | Email, password fields, login button, Google button visible |
+| FAV-009 | Modal close on backdrop | 1. Open login modal<br>2. Click outside modal / press X | Modal closes, returns to property search |
+| FAV-010 | Login via modal | 1. Open login modal<br>2. Enter valid credentials<br>3. Click Login | - Modal closes<br>- Page refreshes<br>- User logged in |
+| FAV-011 | Register link in modal | 1. Open login modal<br>2. Click "Register here" link | Navigates to `/register` page |
+| FAV-012 | Favourites visible after login | 1. Login via modal<br>2. View property search | Previously favourited properties show filled hearts |
+
+### 12.3 My Favourites Page
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-013 | Access My Favourites | 1. Login as non-admin<br>2. Navigate to `/account/my-favourites` | Page loads with "My Favourites" title |
+| FAV-014 | Empty favourites message | 1. Remove all favourites<br>2. View My Favourites page | Message: "You have no favourited properties." |
+| FAV-015 | Favourites table displays | 1. Have at least one favourite<br>2. View My Favourites | Table shows Property (address), Status, and action buttons |
+| FAV-016 | Property address format | 1. View favourite in table | Address shows: address1, address2 (if exists), city, postcode |
+| FAV-017 | Status badge displays | 1. View favourite with "for-sale" status | Blue "For Sale" badge in Status column |
+| FAV-018 | View property button | 1. Click eye icon on favourite | Navigates to `/property/[id]` detail page |
+| FAV-019 | Back from property page | 1. Navigate to property from favourites<br>2. Click browser back | Returns to My Favourites page |
+
+### 12.4 Remove from My Favourites
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-020 | Remove favourite | 1. Click trash icon on favourite | - Row removed from table<br>- Success toast: "Property removed from favourites" |
+| FAV-021 | Remove updates count | 1. Have 3 favourites on page<br>2. Remove one | Table shows 2 remaining favourites |
+| FAV-022 | Remove last favourite | 1. Have 1 favourite<br>2. Remove it | Empty favourites message appears |
+| FAV-023 | Error handling | 1. Simulate network error (offline)<br>2. Try to remove favourite | Error toast: "Failed to remove property from favourites" |
+
+### 12.5 My Favourites Pagination
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-024 | Pagination displays | 1. Have 3+ favourites (page size is 2)<br>2. View My Favourites | Pagination buttons appear in table footer |
+| FAV-025 | Navigate pages | 1. Click page 2 button | - URL updates to `?page=2`<br>- Page 2 favourites shown |
+| FAV-026 | Current page disabled | 1. View page 1 | Page 1 button is disabled |
+| FAV-027 | Delete last on page redirect | 1. Have 3 favourites (pages 1 and 2)<br>2. Go to page 2<br>3. Delete the favourite | Redirected to page 1 (last valid page) |
+
+### 12.6 Route Protection
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FAV-028 | My Favourites requires login | 1. Logout<br>2. Navigate to `/account/my-favourites` | Redirected to homepage |
+| FAV-029 | Admin cannot access My Favourites | 1. Login as admin<br>2. Navigate to `/account/my-favourites` | Redirected to homepage |
+
+---
+
 ## Test Data
 
 ### Valid Test Property
