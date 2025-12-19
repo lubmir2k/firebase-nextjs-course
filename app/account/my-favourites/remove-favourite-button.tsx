@@ -19,10 +19,13 @@ export default function RemoveFavouriteButton({ propertyId }: Props) {
     const tokenResult = await auth.currentUser?.getIdTokenResult();
     if (!tokenResult) return;
 
-    await removeFavourite(propertyId, tokenResult.token);
-
-    toast.success("Property removed from favourites");
-    router.refresh();
+    try {
+      await removeFavourite(propertyId, tokenResult.token);
+      toast.success("Property removed from favourites");
+      router.refresh();
+    } catch {
+      toast.error("Failed to remove property from favourites");
+    }
   };
 
   return (

@@ -26,16 +26,20 @@ export default function ToggleFavouriteButton({
       return;
     }
 
-    if (isFavourite) {
-      await removeFavourite(propertyId, tokenResult.token);
-    } else {
-      await addFavorite(propertyId, tokenResult.token);
-    }
+    try {
+      if (isFavourite) {
+        await removeFavourite(propertyId, tokenResult.token);
+      } else {
+        await addFavorite(propertyId, tokenResult.token);
+      }
 
-    toast.success(
-      `Property ${isFavourite ? "removed from" : "added to"} favourites`
-    );
-    router.refresh();
+      toast.success(
+        `Property ${isFavourite ? "removed from" : "added to"} favourites`
+      );
+      router.refresh();
+    } catch {
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   return (

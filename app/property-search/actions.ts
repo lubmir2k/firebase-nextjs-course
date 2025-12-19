@@ -7,10 +7,7 @@ export const addFavorite = async (propertyId: string, authToken: string) => {
   const verifiedToken = await auth.verifyIdToken(authToken);
 
   if (!verifiedToken) {
-    return {
-      error: true,
-      message: "Unauthorized",
-    };
+    throw new Error("Unauthorized");
   }
 
   await firestore
@@ -28,10 +25,7 @@ export const removeFavourite = async (propertyId: string, authToken: string) => 
   const verifiedToken = await auth.verifyIdToken(authToken);
 
   if (!verifiedToken) {
-    return {
-      error: true,
-      message: "Unauthorized",
-    };
+    throw new Error("Unauthorized");
   }
 
   await firestore

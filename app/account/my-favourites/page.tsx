@@ -30,7 +30,8 @@ export default async function MyFavourites({ searchParams }: Props) {
 
   // Get page from search params
   const searchParamsValues = await searchParams;
-  const page = searchParamsValues?.page ? parseInt(searchParamsValues.page) : 1;
+  const parsedPage = Number(searchParamsValues?.page);
+  const page = parsedPage > 0 ? parsedPage : 1;
 
   // Paginate the IDs
   const paginatedFavourites = allFavourites.slice(
