@@ -23,7 +23,11 @@ const formSchema = z.object({
   password: z.string().min(1, { message: "Password is required." }),
 });
 
-export default function LoginForm() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export default function LoginForm({ onSuccess }: Props) {
   const auth = useAuth();
   const router = useRouter();
 
@@ -38,7 +42,11 @@ export default function LoginForm() {
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       await auth.loginWithEmail(data.email, data.password);
-      router.refresh();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.refresh();
+      }
     } catch (e: unknown) {
       const isInvalidCredential =
         e instanceof Object && "code" in e && e.code === "auth/invalid-credential";

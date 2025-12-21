@@ -8,6 +8,11 @@ import { HomeIcon, BedIcon, BathIcon } from "lucide-react";
 import numeral from "numeral";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import ToggleFavouriteButton from "./ToggleFavouriteButton";
+import { getUserFavourites } from "@/data/favourites";
+import { cookies } from "next/headers";
+import { auth } from "@/firebase/server";
+import { DecodedIdToken } from "firebase-admin/auth";
 
 type Props = {
   searchParams: Promise<{
@@ -19,6 +24,18 @@ type Props = {
 };
 
 export default async function PropertySearch({ searchParams }: Props) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("firebaseAuthToken")?.value;
+
+  let verifiedToken: DecodedIdToken | null = null;
+  if (token) {
+    try {
+      verifiedToken = await auth.verifyIdToken(token);
+    } catch {
+      // Token verification failed, treat as logged out
+    }
+  }
+
   const searchParamsValues = await searchParams;
 
   const parsedPage = parseInt(searchParamsValues.page ?? "");
@@ -33,18 +50,21 @@ export default async function PropertySearch({ searchParams }: Props) {
   const parsedMinBedrooms = parseInt(searchParamsValues.minBedrooms ?? "");
   const minBedrooms = isNaN(parsedMinBedrooms) ? null : parsedMinBedrooms;
 
-  const { data, totalPages } = await getProperties({
-    pagination: {
-      page,
-      pageSize: 3,
-    },
-    filters: {
-      minPrice,
-      maxPrice,
-      minBedrooms,
-      status: ["for-sale"],
-    },
-  });
+  const [{ data, totalPages }, userFavourites] = await Promise.all([
+    getProperties({
+      pagination: {
+        page,
+        pageSize: 3,
+      },
+      filters: {
+        minPrice,
+        maxPrice,
+        minBedrooms,
+        status: ["for-sale"],
+      },
+    }),
+    getUserFavourites(),
+  ]);
 
   return (
     <div className="max-w-screen-lg mx-auto">
@@ -80,6 +100,12 @@ export default async function PropertySearch({ searchParams }: Props) {
               <CardContent className="px-0 pb-0">
                 {property.images && property.images[0] && (
                   <div className="h-40 relative">
+                    {(!verifiedToken || !verifiedToken.admin) && (
+                      <ToggleFavouriteButton
+                        propertyId={property.id}
+                        isFavourite={!!userFavourites[property.id]}
+                      />
+                    )}
                     <Image
                       fill
                       className="object-cover"
@@ -90,6 +116,12 @@ export default async function PropertySearch({ searchParams }: Props) {
                 )}
                 {!property.images?.[0] && (
                   <div className="h-40 relative bg-sky-50 text-zinc-400 flex flex-col justify-center items-center">
+                    {(!verifiedToken || !verifiedToken.admin) && (
+                      <ToggleFavouriteButton
+                        propertyId={property.id}
+                        isFavourite={!!userFavourites[property.id]}
+                      />
+                    )}
                     <HomeIcon />
                     <small>No Image</small>
                   </div>
