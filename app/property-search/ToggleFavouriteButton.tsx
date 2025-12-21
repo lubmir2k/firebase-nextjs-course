@@ -1,9 +1,11 @@
 "use client";
 
+import { useRef } from "react";
 import { HeartIcon } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 import { addFavorite, removeFavourite } from "./actions";
 
 type Props = {
@@ -17,12 +19,13 @@ export default function ToggleFavouriteButton({
 }: Props) {
   const auth = useAuth();
   const router = useRouter();
+  const loginLinkRef = useRef<HTMLAnchorElement>(null);
 
   const handleClick = async () => {
     const tokenResult = await auth.currentUser?.getIdTokenResult();
 
     if (!tokenResult) {
-      router.push("/login");
+      loginLinkRef.current?.click();
       return;
     }
 
@@ -43,14 +46,17 @@ export default function ToggleFavouriteButton({
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className="absolute top-0 right-0 z-10 p-2 bg-white rounded-bl-lg"
-    >
-      <HeartIcon
-        className="text-black"
-        fill={isFavourite ? "#db2777" : "white"}
-      />
-    </button>
+    <>
+      <Link ref={loginLinkRef} href="/login" className="hidden" />
+      <button
+        onClick={handleClick}
+        className="absolute top-0 right-0 z-10 p-2 bg-white rounded-bl-lg"
+      >
+        <HeartIcon
+          className="text-black"
+          fill={isFavourite ? "#db2777" : "white"}
+        />
+      </button>
+    </>
   );
 }
