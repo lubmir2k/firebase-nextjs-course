@@ -23,7 +23,8 @@ export default function RemoveFavouriteButton({ propertyId }: Props) {
       await removeFavourite(propertyId, tokenResult.token);
       toast.success("Property removed from favourites");
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error("Failed to remove property from favourites:", error);
       toast.error("Failed to remove property from favourites");
     }
   };

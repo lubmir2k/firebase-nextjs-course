@@ -40,7 +40,8 @@ export default function ToggleFavouriteButton({
         `Property ${isFavourite ? "removed from" : "added to"} favourites`
       );
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error("Failed to toggle favourite:", error);
       toast.error("An error occurred. Please try again.");
     }
   };
