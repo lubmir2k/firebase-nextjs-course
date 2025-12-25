@@ -21,6 +21,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 
 const formSchema = z
   .object({
@@ -64,14 +65,13 @@ export default function UpdatePasswordForm() {
 
       toast.success("Password updated successfully");
       form.reset();
-    } catch (e: unknown) {
+    } catch (e) {
       console.error("Failed to update password:", e);
-      const error = e as { code?: string };
-      toast.error(
-        error.code === "auth/invalid-credential"
-          ? "Your current password is incorrect"
-          : "An error occurred"
-      );
+      if (e instanceof FirebaseError && e.code === "auth/invalid-credential") {
+        toast.error("Your current password is incorrect");
+      } else {
+        toast.error("An error occurred");
+      }
     }
   };
 

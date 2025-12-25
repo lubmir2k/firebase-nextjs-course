@@ -21,6 +21,7 @@ import {
   reauthenticateWithCredential,
   deleteUser,
 } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 import { removeToken } from "@/context/actions";
 import { deleteUserFavourites } from "./actions";
 import { toast } from "sonner";
@@ -43,14 +44,13 @@ export default function DeleteAccountButton() {
       await deleteUser(auth.currentUser);
       await removeToken();
       toast.success("Your account was deleted successfully");
-    } catch (e: unknown) {
+    } catch (e) {
       console.error("Failed to delete account:", e);
-      const error = e as { code?: string };
-      toast.error(
-        error.code === "auth/invalid-credential"
-          ? "Your current password is incorrect"
-          : "An error occurred"
-      );
+      if (e instanceof FirebaseError && e.code === "auth/invalid-credential") {
+        toast.error("Your current password is incorrect");
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setIsDeleting(false);
     }
