@@ -8,25 +8,29 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const { pathname } = request.nextUrl;
+
   // Get auth token from cookies
   const cookieStore = await cookies();
   const token = cookieStore.get("firebaseAuthToken")?.value;
 
-  // Allow non-logged-in users to access login/register/property-search pages
+  // Allow non-logged-in users to access login/register/forgot-password/property-search pages
   if (
     !token &&
-    (request.nextUrl.pathname.startsWith("/login") ||
-      request.nextUrl.pathname.startsWith("/register") ||
-      request.nextUrl.pathname.startsWith("/property-search"))
+    (pathname.startsWith("/login") ||
+      pathname.startsWith("/register") ||
+      pathname.startsWith("/forgot-password") ||
+      pathname.startsWith("/property-search"))
   ) {
     return NextResponse.next();
   }
 
-  // Redirect logged-in users away from login/register pages
+  // Redirect logged-in users away from login/register/forgot-password pages
   if (
     token &&
-    (request.nextUrl.pathname.startsWith("/login") ||
-      request.nextUrl.pathname.startsWith("/register"))
+    (pathname.startsWith("/login") ||
+      pathname.startsWith("/register") ||
+      pathname.startsWith("/forgot-password"))
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -53,27 +57,19 @@ export async function middleware(request: NextRequest) {
     if (decodedToken.exp && (decodedToken.exp - 300) * 1000 < Date.now()) {
       return NextResponse.redirect(
         new URL(
-          `/api/refresh-token?redirect=${encodeURIComponent(
-            request.nextUrl.pathname
-          )}`,
+          `/api/refresh-token?redirect=${encodeURIComponent(pathname)}`,
           request.url
         )
       );
     }
 
     // Only require admin for /admin-dashboard routes
-    if (
-      !decodedToken.admin &&
-      request.nextUrl.pathname.startsWith("/admin-dashboard")
-    ) {
+    if (!decodedToken.admin && pathname.startsWith("/admin-dashboard")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
     // Redirect admins away from /account/my-favourites (favorites is for regular users)
-    if (
-      decodedToken.admin &&
-      request.nextUrl.pathname.startsWith("/account/my-favourites")
-    ) {
+    if (decodedToken.admin && pathname.startsWith("/account/my-favourites")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   } catch {
@@ -95,6 +91,7 @@ export const config = {
     "/admin-dashboard/:path*",
     "/login",
     "/register",
+    "/forgot-password",
     "/account",
     "/account/:path*",
     "/property-search",

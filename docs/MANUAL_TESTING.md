@@ -74,6 +74,13 @@ This document provides test cases for all implemented functionality in the Fire 
 | ROUTE-006 | Access login page when logged in | 1. Login<br>2. Navigate to `/login` | Redirected to homepage |
 | ROUTE-007 | Access login page when logged out | 1. Logout<br>2. Navigate to `/login` | Login page displays normally |
 
+### 2.3 Forgot Password Route Protection
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| ROUTE-008 | Access forgot password when logged in | 1. Login<br>2. Navigate to `/forgot-password` | Redirected to homepage |
+| ROUTE-009 | Access forgot password when logged out | 1. Logout<br>2. Navigate to `/forgot-password` | Forgot password page displays normally |
+
 ---
 
 ## 3. Admin Dashboard
@@ -441,6 +448,108 @@ This document provides test cases for all implemented functionality in the Fire 
 |---------|-----------|-------|-----------------|
 | FAV-028 | My Favourites requires login | 1. Logout<br>2. Navigate to `/account/my-favourites` | Redirected to homepage |
 | FAV-029 | Admin cannot access My Favourites | 1. Login as admin<br>2. Navigate to `/account/my-favourites` | Redirected to homepage |
+
+---
+
+## 13. My Account Page
+
+### 13.1 Page Access and Display
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| ACC-001 | Access My Account page | 1. Login with email/password<br>2. Navigate to `/account` | Page loads with "My Account" card |
+| ACC-002 | Redirect when logged out | 1. Logout<br>2. Navigate to `/account` | Redirected to homepage |
+| ACC-003 | Email display | 1. Login<br>2. View My Account page | User's email address is displayed |
+| ACC-004 | Password form visible for password users | 1. Login with email/password<br>2. View My Account | "Update Password" section is visible |
+| ACC-005 | Password form hidden for Google users | 1. Login with Google<br>2. View My Account | "Update Password" section is NOT visible |
+| ACC-006 | Danger zone visible for non-admin | 1. Login as non-admin<br>2. View My Account | "Danger Zone" with Delete Account button is visible |
+| ACC-007 | Danger zone hidden for admin | 1. Login as admin<br>2. View My Account | "Danger Zone" section is NOT visible |
+
+---
+
+## 14. Update Password
+
+### 14.1 Form Display
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PASS-001 | Form fields display | 1. Login with email/password<br>2. View My Account | Form shows: Current Password, New Password, Confirm New Password, Update Password button |
+| PASS-002 | Form has border separator | 1. View Update Password section | Section has top border separating it from email |
+
+### 14.2 Form Validation
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PASS-003 | Weak password rejected | 1. Enter current password<br>2. Enter "abc123" as new password<br>3. Submit | Validation error about password requirements (6+ chars, uppercase, lowercase, number, special char) |
+| PASS-004 | Password mismatch | 1. Enter valid current password<br>2. Enter "StrongPass1!" as new password<br>3. Enter "DifferentPass1!" as confirm<br>4. Submit | Error: "Passwords do not match" |
+| PASS-005 | All fields required | 1. Leave any field empty<br>2. Submit | Validation error for empty field |
+
+### 14.3 Password Update Flow
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PASS-006 | Wrong current password | 1. Enter incorrect current password<br>2. Enter valid new password<br>3. Submit | Error toast: "Your current password is incorrect" |
+| PASS-007 | Successful password update | 1. Enter correct current password<br>2. Enter valid new password and confirm<br>3. Submit | - Success toast: "Password updated successfully"<br>- Form fields are cleared |
+| PASS-008 | Can login with new password | 1. Update password successfully<br>2. Logout<br>3. Login with new password | Login succeeds with new password |
+| PASS-009 | Form disabled during submit | 1. Fill form with valid data<br>2. Click Update Password<br>3. Observe form | All fields and button disabled during submission |
+
+---
+
+## 15. Delete Account
+
+### 15.1 Confirmation Dialog
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| DEL-001 | Delete button displays | 1. Login as non-admin<br>2. View My Account | Red "Delete Account" button visible in Danger Zone |
+| DEL-002 | Confirmation modal opens | 1. Click "Delete Account" button | Alert dialog appears with confirmation message |
+| DEL-003 | Modal content | 1. Open delete confirmation | - Title: "Are you sure you want to delete your account?"<br>- Warning text about permanent deletion<br>- Password input field |
+| DEL-004 | Cancel button works | 1. Open delete confirmation<br>2. Click "Cancel" | Modal closes, account not deleted |
+| DEL-005 | Delete disabled without password | 1. Open delete confirmation<br>2. Leave password empty | "Delete Account" button in modal is disabled |
+
+### 15.2 Account Deletion Flow
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| DEL-006 | Wrong password rejected | 1. Open delete confirmation<br>2. Enter wrong password<br>3. Click Delete Account | Error toast: "Your current password is incorrect" |
+| DEL-007 | Successful deletion | 1. Open delete confirmation<br>2. Enter correct password<br>3. Click Delete Account | - Success toast: "Your account was deleted successfully"<br>- User is logged out |
+| DEL-008 | Cannot login after deletion | 1. Delete account<br>2. Try to login with deleted credentials | Login fails, account does not exist |
+| DEL-009 | Favorites cleaned up | 1. Add some favorites<br>2. Delete account<br>3. Check Firestore | User's favorites document is deleted from Firestore |
+| DEL-010 | User removed from Firebase Auth | 1. Delete account<br>2. Check Firebase Auth console | User no longer appears in Authentication users list |
+
+### 15.3 Admin Restriction
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| DEL-011 | Admin cannot see delete button | 1. Login as admin<br>2. Navigate to `/account` | Danger Zone section is not visible |
+
+---
+
+## 16. Forgot Password
+
+### 16.1 Page Access
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FORGOT-001 | Access forgot password page | 1. Logout<br>2. Navigate to `/forgot-password` | Page loads with card containing email form |
+| FORGOT-002 | Link from login page | 1. Navigate to `/login`<br>2. Click "Reset it here" link | Navigates to `/forgot-password` page |
+| FORGOT-003 | Page layout | 1. View forgot password page | - Card with "Forgot Password" title<br>- Description about reset email<br>- Email input field<br>- "Reset Password" button |
+
+### 16.2 Password Reset Flow
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FORGOT-004 | Submit with valid email | 1. Enter valid registered email<br>2. Click "Reset Password" | - Success toast: "Password reset email sent"<br>- Email field is cleared |
+| FORGOT-005 | Check email received | 1. Submit reset for valid email<br>2. Check email inbox | Password reset email from Firebase received |
+| FORGOT-006 | Reset link works | 1. Click link in reset email<br>2. Enter new password on Firebase page<br>3. Submit | Password updated, can login with new password |
+| FORGOT-007 | Button disabled during submit | 1. Enter email<br>2. Click Reset Password<br>3. Observe button | Button shows "Sending..." and is disabled |
+| FORGOT-008 | Invalid email handling | 1. Enter non-registered email<br>2. Click Reset Password | Error toast or Firebase handles silently (security) |
+
+### 16.3 Route Protection
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| FORGOT-009 | Logged in user redirected | 1. Login<br>2. Navigate to `/forgot-password` | Redirected to homepage |
 
 ---
 
