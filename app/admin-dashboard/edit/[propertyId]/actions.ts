@@ -39,3 +39,23 @@ export const updateProperty = async (data: Property, authToken: string) => {
 
   revalidatePath(`/property/${id}`);
 };
+
+export const deleteProperty = async (propertyId: string, authToken: string) => {
+  try {
+    const verifiedToken = await auth.verifyIdToken(authToken);
+
+    if (!verifiedToken.admin) {
+      return {
+        error: true,
+        message: "Unauthorized",
+      };
+    }
+  } catch {
+    return {
+      error: true,
+      message: "Authentication failed",
+    };
+  }
+
+  await firestore.collection("properties").doc(propertyId).delete();
+};
