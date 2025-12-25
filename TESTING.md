@@ -4,47 +4,78 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ## Prerequisites
 
-- Access to the application at `http://localhost:3000`
-- A Google account for authentication testing
+- Access to the application at `http://localhost:3000` or deployed URL
+- Email account for registration and login testing
+- (Optional) Google account for Google OAuth testing
 - Access to Firebase Console for data verification
 - Admin email configured in `.env.local` as `ADMIN_EMAIL`
 
 ---
 
-## 1. Authentication
+## 1. Homepage
 
-### 1.1 Login with Google
-
-| Test ID | Test Case | Steps | Expected Result |
-|---------|-----------|-------|-----------------|
-| AUTH-001 | Access login page when logged out | 1. Ensure logged out<br>2. Navigate to `/login` | Login page displays with "Continue with Google" button |
-| AUTH-002 | Login with Google | 1. Click "Continue with Google"<br>2. Select Google account<br>3. Complete Google auth flow | - Google popup appears<br>- After successful auth, redirected to homepage<br>- User avatar appears in navbar |
-| AUTH-003 | Login popup cancellation | 1. Click "Continue with Google"<br>2. Close the popup without selecting account | User remains on login page, no errors |
-
-### 1.2 Logout
+### 1.1 Landing Page
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| AUTH-004 | Logout from navbar | 1. Login to app<br>2. Click user avatar<br>3. Click "Logout" | - User logged out<br>- Login/Signup links appear in navbar<br>- Redirected to homepage if on protected route |
-| AUTH-005 | Logout from admin dashboard | 1. Login as admin<br>2. Navigate to `/admin-dashboard`<br>3. Click avatar > Logout | Redirected to homepage (not admin dashboard) |
+| HOME-001 | Hero image displays | 1. Navigate to `/` | Full-screen hero image with dark overlay |
+| HOME-002 | Heading displays | 1. View homepage | "Find your new home with Fire Homes" heading in white text |
+| HOME-003 | Search button displays | 1. View homepage | "Search Properties" button with search icon |
+| HOME-004 | Search button navigation | 1. Click "Search Properties" | Navigates to `/property-search` |
+| HOME-005 | Navbar visible | 1. View homepage | Fire Homes logo and navigation links visible |
 
-### 1.3 User Dropdown Menu
+---
+
+## 2. Authentication
+
+### 2.1 Login with Email/Password
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| AUTH-006 | View user info in dropdown | 1. Login<br>2. Click avatar | Dropdown shows:<br>- User display name<br>- User email |
-| AUTH-007 | Admin sees Admin Dashboard link | 1. Login with admin account<br>2. Click avatar | "Admin Dashboard" link visible |
+| AUTH-001 | Access login page when logged out | 1. Ensure logged out<br>2. Navigate to `/login` | Login page displays with email/password form and "Continue with Google" button |
+| AUTH-002 | Login form fields | 1. View login page | Form shows Email and Password input fields with Login button |
+| AUTH-003 | Empty email validation | 1. Leave email empty<br>2. Enter password<br>3. Click Login | Error: "Invalid email" |
+| AUTH-004 | Invalid email format | 1. Enter "notanemail"<br>2. Enter password<br>3. Click Login | Error: "Invalid email" |
+| AUTH-005 | Empty password validation | 1. Enter valid email<br>2. Leave password empty<br>3. Click Login | Error: "Password is required." |
+| AUTH-006 | Invalid credentials | 1. Enter valid email<br>2. Enter wrong password<br>3. Click Login | Error toast: "Incorrect credentials" |
+| AUTH-007 | Successful login | 1. Enter valid email<br>2. Enter correct password<br>3. Click Login | - Page refreshes<br>- User avatar appears in navbar<br>- Redirected appropriately |
+| AUTH-008 | Form disabled during submit | 1. Enter valid credentials<br>2. Click Login<br>3. Observe form | All fields and button disabled during submission |
+| AUTH-009 | Forgot password link | 1. View login page | "Reset it here" link visible, navigates to `/forgot-password` |
+| AUTH-010 | Register link | 1. View login page footer | "Register here" link visible, navigates to `/register` |
 
-### 1.4 Token Refresh
+### 2.2 Login with Google
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| AUTH-008 | Token refresh on expiring token | 1. Login as admin<br>2. Wait until token is within 5 minutes of expiry (or manually edit cookie expiry in dev tools)<br>3. Navigate to `/admin-dashboard` | - Redirected to `/api/refresh-token?redirect=/admin-dashboard`<br>- New token obtained silently<br>- Redirected back to `/admin-dashboard` |
-| AUTH-009 | Refresh with invalid refresh token | 1. Login as admin<br>2. Manually delete or corrupt `firebaseAuthRefreshToken` cookie in dev tools<br>3. Set `firebaseAuthToken` to an expired token<br>4. Navigate to `/admin-dashboard` | Redirected to homepage |
-| AUTH-010 | Refresh preserves redirect path | 1. Login as admin<br>2. Set token to near-expiry<br>3. Navigate to `/admin-dashboard/edit/[property-id]` | After refresh, redirected to the same edit page (not homepage or dashboard) |
-| AUTH-011 | Refresh without redirect param | 1. Directly navigate to `/api/refresh-token` (no redirect param) | Redirected to homepage |
-| AUTH-012 | Expired token without refresh token | 1. Delete `firebaseAuthRefreshToken` cookie<br>2. Wait for `firebaseAuthToken` to expire<br>3. Navigate to protected route | - Both cookies deleted<br>- Redirected to homepage |
-| AUTH-013 | Cookies updated after refresh | 1. Trigger token refresh (token near expiry)<br>2. Check cookies in dev tools after redirect | Both `firebaseAuthToken` and `firebaseAuthRefreshToken` have new values |
+| AUTH-011 | Google button displays | 1. View login page | "Continue with Google" button visible below the form |
+| AUTH-012 | Login with Google | 1. Click "Continue with Google"<br>2. Select Google account<br>3. Complete Google auth flow | - Google popup appears<br>- After successful auth, page refreshes<br>- User avatar appears in navbar |
+| AUTH-013 | Google popup cancellation | 1. Click "Continue with Google"<br>2. Close the popup without selecting account | User remains on login page, no errors |
+
+### 2.3 Logout
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| AUTH-014 | Logout from navbar | 1. Login to app<br>2. Click user avatar<br>3. Click "Logout" | - User logged out<br>- Login/Sign Up links appear in navbar<br>- Redirected to homepage if on protected route |
+| AUTH-015 | Logout from admin dashboard | 1. Login as admin<br>2. Navigate to `/admin-dashboard`<br>3. Click avatar > Logout | Redirected to homepage (not admin dashboard) |
+
+### 2.4 User Dropdown Menu
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| AUTH-016 | View user info in dropdown | 1. Login<br>2. Click avatar | Dropdown shows:<br>- User name (from registration or Google)<br>- User email |
+| AUTH-017 | Admin sees Admin Dashboard link | 1. Login with admin account<br>2. Click avatar | "Admin Dashboard" link visible |
+| AUTH-018 | Non-admin sees My Account link | 1. Login with non-admin account<br>2. Click avatar | "My Account" and "My Favourites" links visible |
+
+### 2.5 Token Refresh
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| AUTH-019 | Token refresh on expiring token | 1. Login as admin<br>2. Wait until token is within 5 minutes of expiry (or manually edit cookie expiry in dev tools)<br>3. Navigate to `/admin-dashboard` | - Redirected to `/api/refresh-token?redirect=/admin-dashboard`<br>- New token obtained silently<br>- Redirected back to `/admin-dashboard` |
+| AUTH-020 | Refresh with invalid refresh token | 1. Login as admin<br>2. Manually delete or corrupt `firebaseAuthRefreshToken` cookie in dev tools<br>3. Set `firebaseAuthToken` to an expired token<br>4. Navigate to `/admin-dashboard` | Redirected to homepage |
+| AUTH-021 | Refresh preserves redirect path | 1. Login as admin<br>2. Set token to near-expiry<br>3. Navigate to `/admin-dashboard/edit/[property-id]` | After refresh, redirected to the same edit page (not homepage or dashboard) |
+| AUTH-022 | Refresh without redirect param | 1. Directly navigate to `/api/refresh-token` (no redirect param) | Redirected to homepage |
+| AUTH-023 | Expired token without refresh token | 1. Delete `firebaseAuthRefreshToken` cookie<br>2. Wait for `firebaseAuthToken` to expire<br>3. Navigate to protected route | - Both cookies deleted<br>- Redirected to homepage |
+| AUTH-024 | Cookies updated after refresh | 1. Trigger token refresh (token near expiry)<br>2. Check cookies in dev tools after redirect | Both `firebaseAuthToken` and `firebaseAuthRefreshToken` have new values |
 
 > **Testing Tip:** To test token refresh without waiting, you can use browser dev tools:
 > 1. Open Application > Cookies
@@ -55,9 +86,52 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 2. Route Protection
+## 3. Registration
 
-### 2.1 Admin Routes Protection
+### 3.1 Registration Page
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| REG-001 | Access registration page | 1. Navigate to `/register` | Registration page displays with form |
+| REG-002 | Form fields display | 1. View registration page | Fields: Your name, Email, Password, Confirm password, Register button |
+| REG-003 | Login link | 1. View registration page footer | "Log in here" link visible, navigates to `/login` |
+| REG-004 | Google button displays | 1. View registration page | "Continue with Google" button visible below the form |
+
+### 3.2 Registration Form Validation
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| REG-005 | Short name rejected | 1. Enter "A" in name field<br>2. Fill other fields<br>3. Submit | Error: "Name must be at least 2 characters" |
+| REG-006 | Invalid email format | 1. Enter "notanemail"<br>2. Fill other fields<br>3. Submit | Error: "Invalid email" |
+| REG-007 | Weak password - too short | 1. Enter "Ab1!" (less than 6 chars)<br>2. Submit | Error about password requirements |
+| REG-008 | Weak password - no uppercase | 1. Enter "abcdef1!" (no uppercase)<br>2. Submit | Error: "Password must contain at least 6 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character" |
+| REG-009 | Weak password - no lowercase | 1. Enter "ABCDEF1!" (no lowercase)<br>2. Submit | Error about password requirements |
+| REG-010 | Weak password - no number | 1. Enter "Abcdef!" (no number)<br>2. Submit | Error about password requirements |
+| REG-011 | Weak password - no special char | 1. Enter "Abcdef1" (no special char)<br>2. Submit | Error about password requirements |
+| REG-012 | Password mismatch | 1. Enter "ValidPass1!" as password<br>2. Enter "DifferentPass1!" as confirm<br>3. Submit | Error: "Passwords do not match" |
+| REG-013 | Valid password accepted | 1. Enter "ValidPass1!" for both password fields<br>2. Fill other fields correctly<br>3. Submit | No password validation errors |
+
+### 3.3 Registration Flow
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| REG-014 | Successful registration | 1. Fill all fields with valid data<br>2. Click Register | - Success toast: "Your account was created successfully!"<br>- Redirected to `/login` |
+| REG-015 | Form disabled during submit | 1. Fill valid data<br>2. Click Register<br>3. Observe form | All fields and button disabled during submission |
+| REG-016 | Email already exists | 1. Register with email that exists<br>2. Submit | Error toast with appropriate message |
+| REG-017 | Can login after registration | 1. Register successfully<br>2. Navigate to login<br>3. Login with new credentials | Login succeeds |
+| REG-018 | Verify in Firebase Auth | 1. Register new user<br>2. Check Firebase Console > Authentication | New user appears in users list |
+
+### 3.4 Registration Route Protection
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| REG-019 | Logged in user redirected | 1. Login<br>2. Navigate to `/register` | Redirected to homepage |
+
+---
+
+## 4. Route Protection
+
+### 4.1 Admin Routes Protection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -67,14 +141,14 @@ This document provides test cases for all implemented functionality in the Fire 
 | ROUTE-004 | Access new property page when logged out | 1. Logout<br>2. Navigate to `/admin-dashboard/new` | Redirected to homepage |
 | ROUTE-005 | Access edit property page when logged out | 1. Logout<br>2. Navigate to `/admin-dashboard/edit/[any-id]` | Redirected to homepage |
 
-### 2.2 Login Route Protection
+### 4.2 Login Route Protection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | ROUTE-006 | Access login page when logged in | 1. Login<br>2. Navigate to `/login` | Redirected to homepage |
 | ROUTE-007 | Access login page when logged out | 1. Logout<br>2. Navigate to `/login` | Login page displays normally |
 
-### 2.3 Forgot Password Route Protection
+### 4.3 Forgot Password Route Protection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -83,9 +157,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 3. Admin Dashboard
+## 5. Admin Dashboard
 
-### 3.1 Dashboard Overview
+### 5.1 Dashboard Overview
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -94,7 +168,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | DASH-003 | Breadcrumbs display | 1. Navigate to `/admin-dashboard` | Breadcrumb shows "Dashboard" |
 | DASH-004 | New Property button | 1. Navigate to `/admin-dashboard`<br>2. Click "New Property" button | Navigates to `/admin-dashboard/new` |
 
-### 3.2 Properties Table
+### 5.2 Properties Table
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -107,7 +181,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | TABLE-007 | Status badge - Sold | 1. View property with "sold" status | Green/success badge with "Sold" text |
 | TABLE-008 | Edit button | 1. Click pencil icon on property row | Navigates to `/admin-dashboard/edit/[id]` |
 
-### 3.3 Pagination
+### 5.3 Pagination
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -119,16 +193,16 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 4. Create Property
+## 6. Create Property
 
-### 4.1 New Property Page
+### 6.1 New Property Page
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | NEW-001 | Page layout | 1. Navigate to `/admin-dashboard/new` | - Breadcrumbs: Dashboard > New Property<br>- Card with "New Property" title<br>- Form with all fields |
 | NEW-002 | Breadcrumb navigation | 1. Click "Dashboard" in breadcrumbs | Navigates back to `/admin-dashboard` |
 
-### 4.2 Property Form Fields
+### 6.2 Property Form Fields
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -138,7 +212,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FORM-004 | Number fields | 1. Check Price, Bedrooms, Bathrooms inputs | Input type is "number" |
 | FORM-005 | Description textarea | 1. View description field | Textarea with 5 rows, no resize |
 
-### 4.3 Form Validation
+### 6.3 Form Validation
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -151,7 +225,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | VAL-007 | Negative bedrooms/bathrooms | 1. Enter "-1" in Bedrooms or Bathrooms<br>2. Submit form | Error: "Bedrooms/Bathrooms must be at least 0" |
 | VAL-008 | Optional Address Line 2 | 1. Leave Address Line 2 empty<br>2. Fill all other required fields<br>3. Submit | Form submits successfully |
 
-### 4.4 Form Submission
+### 6.4 Form Submission
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -162,9 +236,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 5. Edit Property
+## 7. Edit Property
 
-### 5.1 Edit Property Page
+### 7.1 Edit Property Page
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -172,7 +246,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | EDIT-002 | Default values loaded | 1. Open edit page for property | All fields populated with existing property data |
 | EDIT-003 | Breadcrumb navigation | 1. Click "Dashboard" in breadcrumbs | Navigates back to `/admin-dashboard` |
 
-### 5.2 Edit Form Submission
+### 7.2 Edit Form Submission
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -183,7 +257,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | EDIT-008 | Success toast | 1. Successfully update property | Green toast: "Success" with "Property updated" description |
 | EDIT-009 | Verify in Firebase | 1. Update property<br>2. Check Firebase Firestore | - Document updated with new values<br>- "updated" timestamp changed<br>- "created" timestamp unchanged |
 
-### 5.3 Validation on Edit
+### 7.3 Validation on Edit
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -191,9 +265,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 6. Image Upload
+## 8. Image Upload
 
-### 6.1 Upload Button and File Selection
+### 8.1 Upload Button and File Selection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -204,7 +278,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-005 | File type restriction | 1. Click "Upload Images"<br>2. Try to select non-image file | File picker only shows image files (image/*) |
 | IMG-006 | Cancel file picker | 1. Click "Upload Images"<br>2. Close file picker without selecting | No changes to image list |
 
-### 6.2 Image List Display
+### 8.2 Image List Display
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -215,7 +289,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-011 | Move handle | 1. View uploaded image | Gray move icon visible on each image row |
 | IMG-012 | Gray background styling | 1. View image list | Each row has light gray background with rounded corners |
 
-### 6.3 Image Deletion
+### 8.3 Image Deletion
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -224,7 +298,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-015 | Delete featured image | 1. Upload images<br>2. Delete first image | Second image becomes "Image 1" with Featured badge |
 | IMG-016 | Delete all images | 1. Upload images<br>2. Delete all one by one | Image list empty, only "Upload Images" button visible |
 
-### 6.4 Drag and Drop Reordering
+### 8.4 Drag and Drop Reordering
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -234,7 +308,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-020 | Drag outside list | 1. Start dragging image<br>2. Drop outside the list area | Image returns to original position |
 | IMG-021 | List height maintained | 1. Start dragging an image | List maintains height (no jumping), placeholder visible |
 
-### 6.5 New Property with Images
+### 8.5 New Property with Images
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -243,7 +317,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-024 | Verify Firestore paths | 1. Create property with images<br>2. Check Firestore document | `images` array contains paths to uploaded files |
 | IMG-025 | Create without images | 1. Fill property form (no images)<br>2. Submit | Property created successfully, no images field or empty array |
 
-### 6.6 Edit Property - Existing Images
+### 8.6 Edit Property - Existing Images
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -254,7 +328,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | IMG-030 | Reorder existing images | 1. Edit property with images<br>2. Reorder via drag<br>3. Save | New order persisted in Firestore |
 | IMG-031 | Mixed operations | 1. Edit property<br>2. Delete one image<br>3. Add new image<br>4. Reorder<br>5. Save | All changes persist correctly |
 
-### 6.7 Firebase Storage Verification
+### 8.7 Firebase Storage Verification
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -265,9 +339,56 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 7. UI Components
+## 9. Property Details Page
 
-### 7.1 Navbar
+### 9.1 Page Access
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PROP-001 | Access property page | 1. Navigate to `/property/[valid-id]` | Property details page loads |
+| PROP-002 | Invalid property ID | 1. Navigate to `/property/invalid-id-123` | 404 Not Found page |
+| PROP-003 | Access from search | 1. Go to property search<br>2. Click "View Property" on a card | Navigates to property detail page |
+
+### 9.2 Image Carousel
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PROP-004 | Carousel displays | 1. View property with images | Image carousel visible on left side |
+| PROP-005 | Single image - no arrows | 1. View property with 1 image | Carousel shows image, no navigation arrows |
+| PROP-006 | Multiple images - arrows | 1. View property with 2+ images | Previous and Next arrow buttons visible |
+| PROP-007 | Navigate carousel | 1. View property with multiple images<br>2. Click Next arrow | Carousel advances to next image |
+| PROP-008 | Carousel image sizing | 1. View carousel | Images fill 80vh height with object-cover |
+| PROP-009 | Property without images | 1. View property with no images | No carousel section displayed |
+
+### 9.3 Property Information
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PROP-010 | Status badge | 1. View property page | Status badge displays (For Sale, Sold, etc.) |
+| PROP-011 | Address display | 1. View property | Full address shown: address1, address2 (if exists), city, postcode |
+| PROP-012 | Price display | 1. View property with price 350000 | Displays as "£350,000" with formatting |
+| PROP-013 | Bedrooms display | 1. View property | Bed icon with bedroom count visible |
+| PROP-014 | Bathrooms display | 1. View property | Bath icon with bathroom count visible |
+
+### 9.4 Description
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PROP-015 | Markdown rendering | 1. Create property with markdown description (bold, lists, etc.)<br>2. View property | Markdown renders correctly as formatted HTML |
+| PROP-016 | Description layout | 1. View description section | Description appears below carousel with max-width and padding |
+
+### 9.5 Navigation
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| PROP-017 | Back button | 1. Navigate to property from search<br>2. Click Back button | Returns to previous page (property search) |
+| PROP-018 | Back button position | 1. View property page | Back button visible in description area |
+
+---
+
+## 10. UI Components
+
+### 10.1 Navbar
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -276,22 +397,23 @@ This document provides test cases for all implemented functionality in the Fire 
 | NAV-003 | Logged out state | 1. Logout<br>2. View navbar | Shows "Login" and "Sign Up" links with vertical separator |
 | NAV-004 | Logged in state | 1. Login<br>2. View navbar | User avatar replaces login/signup links |
 
-### 7.2 Toast Notifications
+### 10.2 Toast Notifications
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | TOAST-001 | Success toast appearance | 1. Create or update property | - Toast appears in bottom-right<br>- Green background<br>- Has close button |
 | TOAST-002 | Toast close button | 1. Trigger toast<br>2. Click X button | Toast closes immediately |
 | TOAST-003 | Toast auto-dismiss | 1. Trigger toast<br>2. Wait | Toast auto-dismisses after a few seconds |
+| TOAST-004 | Error toast appearance | 1. Trigger error (e.g., invalid login) | - Toast appears in bottom-right<br>- Red/error styling |
 
-### 7.3 Cards
+### 10.3 Cards
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| CARD-001 | Login card | 1. View `/login` | Card with header "Login" and Google button |
+| CARD-001 | Login card | 1. View `/login` | Card with header "Login" and email/password form with Google button |
 | CARD-002 | Property form cards | 1. View new/edit property pages | Card with appropriate title and form content |
 
-### 7.4 Buttons
+### 10.4 Buttons
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -301,19 +423,21 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 8. Server Actions Security
+## 11. Server Actions Security
 
-### 8.1 Authentication Checks
+### 11.1 Authentication Checks
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | SEC-001 | Create without auth | 1. Logout<br>2. Attempt to call createProperty directly (via dev tools) | Returns error or fails silently |
 | SEC-002 | Update without auth | 1. Logout<br>2. Attempt to call updateProperty directly | Returns error or fails silently |
 | SEC-003 | Non-admin create | 1. Login as non-admin<br>2. Try to access new property page | Redirected by middleware |
+| SEC-004 | Non-admin update | 1. Login as non-admin<br>2. Try to access edit property page | Redirected by middleware |
+| SEC-005 | Tamper with property ID | 1. Login as admin<br>2. Try to update with invalid property ID | Error returned, no data corruption |
 
 ---
 
-## 9. Cross-Browser Testing
+## 12. Cross-Browser Testing
 
 | Test ID | Browser | Test Case | Expected Result |
 |---------|---------|-----------|-----------------|
@@ -324,7 +448,7 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 10. Responsive Testing
+## 13. Responsive Testing
 
 | Test ID | Viewport | Test Case | Expected Result |
 |---------|----------|-----------|-----------------|
@@ -334,16 +458,16 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 11. Property Search
+## 14. Property Search
 
-### 11.1 Search Page Access
+### 14.1 Search Page Access
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | SEARCH-001 | Access search page | Navigate to `/property-search` | Page loads with "Property Search" title and Filters card |
 | SEARCH-002 | Filters form displays | View search page | Form shows Min price, Max price, Min bedrooms inputs with labels and Search button |
 
-### 11.2 Search Filters
+### 14.2 Search Filters
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -353,44 +477,45 @@ This document provides test cases for all implemented functionality in the Fire 
 | SEARCH-006 | Multiple filters | 1. Enter min price 100000<br>2. Enter max price 300000<br>3. Enter min bedrooms 2<br>4. Click Search | All filters applied, URL contains all params |
 | SEARCH-007 | Clear filters | 1. Apply filters<br>2. Clear all inputs<br>3. Click Search | URL has only `page=1`, all for-sale properties shown |
 | SEARCH-008 | Filter persistence on refresh | 1. Apply filters<br>2. Refresh page (F5) | Form inputs retain filter values from URL |
+| SEARCH-009 | Only for-sale properties shown | 1. View search results | Only properties with "for-sale" status displayed (no Draft, Sold, Withdrawn) |
 
-### 11.3 Property Results Grid
-
-| Test ID | Test Case | Steps | Expected Result |
-|---------|-----------|-------|-----------------|
-| SEARCH-009 | Grid layout | View results with multiple properties | Properties displayed in 3-column grid |
-| SEARCH-010 | Property card with image | View property that has images | Card shows thumbnail image with rounded corners |
-| SEARCH-011 | Property card placeholder | View property without images | Card shows HomeIcon with "No Image" text on sky-blue background |
-| SEARCH-012 | Property card details | View any property card | Shows: address, bed count with icon, bath count with icon, formatted price |
-| SEARCH-013 | Price formatting | View property with price 250000 | Displays as "£250,000" with comma separator |
-| SEARCH-014 | View Property button | Click "View Property" on any card | Navigates to `/property/[propertyId]` detail page |
-| SEARCH-015 | Empty results | Apply filters that match no properties (e.g., min price 99999999) | Shows "No properties found matching your criteria." message |
-| SEARCH-016 | Image alt text | Right-click image > Inspect | Alt attribute contains property address |
-
-### 11.4 Pagination
+### 14.3 Property Results Grid
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| SEARCH-017 | Pagination buttons display | Have more than 3 for-sale properties | Numbered page buttons appear below grid |
-| SEARCH-018 | Current page disabled | View page 1 (default) | Page 1 button is disabled |
-| SEARCH-019 | Navigate to page 2 | Click page 2 button | URL updates to `page=2`, page 2 results shown, page 2 button disabled |
-| SEARCH-020 | Filters persist with pagination | 1. Apply min price filter<br>2. Click page 2 | URL contains both `minPrice` and `page=2` params |
-| SEARCH-021 | Direct URL pagination | Navigate to `/property-search?page=2` | Page 2 results display directly |
-| SEARCH-022 | Page size | Count results on a full page | Maximum 3 properties per page |
+| SEARCH-010 | Grid layout | View results with multiple properties | Properties displayed in 3-column grid |
+| SEARCH-011 | Property card with image | View property that has images | Card shows thumbnail image with rounded corners |
+| SEARCH-012 | Property card placeholder | View property without images | Card shows HomeIcon with "No Image" text on sky-blue background |
+| SEARCH-013 | Property card details | View any property card | Shows: address, bed count with icon, bath count with icon, formatted price |
+| SEARCH-014 | Price formatting | View property with price 250000 | Displays as "£250,000" with comma separator |
+| SEARCH-015 | View Property button | Click "View Property" on any card | Navigates to `/property/[propertyId]` detail page |
+| SEARCH-016 | Empty results | Apply filters that match no properties (e.g., min price 99999999) | Shows "No properties found matching your criteria." message |
+| SEARCH-017 | Image alt text | Right-click image > Inspect | Alt attribute contains property address |
 
-### 11.5 Firestore Indexes
+### 14.4 Pagination
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| SEARCH-023 | Query with filters works | Apply various filter combinations | No console errors about missing indexes |
+| SEARCH-018 | Pagination buttons display | Have more than 3 for-sale properties | Numbered page buttons appear below grid |
+| SEARCH-019 | Current page disabled | View page 1 (default) | Page 1 button is disabled |
+| SEARCH-020 | Navigate to page 2 | Click page 2 button | URL updates to `page=2`, page 2 results shown, page 2 button disabled |
+| SEARCH-021 | Filters persist with pagination | 1. Apply min price filter<br>2. Click page 2 | URL contains both `minPrice` and `page=2` params |
+| SEARCH-022 | Direct URL pagination | Navigate to `/property-search?page=2` | Page 2 results display directly |
+| SEARCH-023 | Page size | Count results on a full page | Maximum 3 properties per page |
+
+### 14.5 Firestore Indexes
+
+| Test ID | Test Case | Steps | Expected Result |
+|---------|-----------|-------|-----------------|
+| SEARCH-024 | Query with filters works | Apply various filter combinations | No console errors about missing indexes |
 
 > **Note for testers:** If you see Firestore index errors in the console, you need to create composite indexes. Click the link in the error message to create the index in Firebase Console. Required indexes include combinations of `status`, `listingPrice`, and `bedrooms` fields.
 
 ---
 
-## 12. Property Favorites
+## 15. Property Favorites
 
-### 12.1 Toggle Favourite Button
+### 15.1 Toggle Favourite Button
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -400,7 +525,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FAV-004 | Favourite state persists | 1. Add property to favourites<br>2. Refresh page | Heart remains filled for favourited property |
 | FAV-005 | Admin cannot see favourites | 1. Login as admin<br>2. Navigate to `/property-search` | Heart buttons are NOT visible on property cards |
 
-### 12.2 Login Modal
+### 15.2 Login Modal
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -412,7 +537,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FAV-011 | Register link in modal | 1. Open login modal<br>2. Click "Register here" link | Navigates to `/register` page |
 | FAV-012 | Favourites visible after login | 1. Login via modal<br>2. View property search | Previously favourited properties show filled hearts |
 
-### 12.3 My Favourites Page
+### 15.3 My Favourites Page
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -424,7 +549,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FAV-018 | View property button | 1. Click eye icon on favourite | Navigates to `/property/[id]` detail page |
 | FAV-019 | Back from property page | 1. Navigate to property from favourites<br>2. Click browser back | Returns to My Favourites page |
 
-### 12.4 Remove from My Favourites
+### 15.4 Remove from My Favourites
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -433,7 +558,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FAV-022 | Remove last favourite | 1. Have 1 favourite<br>2. Remove it | Empty favourites message appears |
 | FAV-023 | Error handling | 1. Simulate network error (offline)<br>2. Try to remove favourite | Error toast: "Failed to remove property from favourites" |
 
-### 12.5 My Favourites Pagination
+### 15.5 My Favourites Pagination
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -442,7 +567,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FAV-026 | Current page disabled | 1. View page 1 | Page 1 button is disabled |
 | FAV-027 | Delete last on page redirect | 1. Have 3 favourites (pages 1 and 2)<br>2. Go to page 2<br>3. Delete the favourite | Redirected to page 1 (last valid page) |
 
-### 12.6 Route Protection
+### 15.6 Route Protection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -451,9 +576,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 13. My Account Page
+## 16. My Account Page
 
-### 13.1 Page Access and Display
+### 16.1 Page Access and Display
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -467,24 +592,24 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 14. Update Password
+## 17. Update Password
 
-### 14.1 Form Display
+### 17.1 Form Display
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
 | PASS-001 | Form fields display | 1. Login with email/password<br>2. View My Account | Form shows: Current Password, New Password, Confirm New Password, Update Password button |
 | PASS-002 | Form has border separator | 1. View Update Password section | Section has top border separating it from email |
 
-### 14.2 Form Validation
+### 17.2 Form Validation
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
-| PASS-003 | Weak password rejected | 1. Enter current password<br>2. Enter "abc123" as new password<br>3. Submit | Validation error about password requirements (6+ chars, uppercase, lowercase, number, special char) |
+| PASS-003 | Weak password rejected | 1. Enter current password<br>2. Enter "abc123" as new password<br>3. Submit | Error: "Password must contain at least 6 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character" |
 | PASS-004 | Password mismatch | 1. Enter valid current password<br>2. Enter "StrongPass1!" as new password<br>3. Enter "DifferentPass1!" as confirm<br>4. Submit | Error: "Passwords do not match" |
 | PASS-005 | All fields required | 1. Leave any field empty<br>2. Submit | Validation error for empty field |
 
-### 14.3 Password Update Flow
+### 17.3 Password Update Flow
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -495,9 +620,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 15. Delete Account
+## 18. Delete Account
 
-### 15.1 Confirmation Dialog
+### 18.1 Confirmation Dialog
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -507,7 +632,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | DEL-004 | Cancel button works | 1. Open delete confirmation<br>2. Click "Cancel" | Modal closes, account not deleted |
 | DEL-005 | Delete disabled without password | 1. Open delete confirmation<br>2. Leave password empty | "Delete Account" button in modal is disabled |
 
-### 15.2 Account Deletion Flow
+### 18.2 Account Deletion Flow
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -517,7 +642,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | DEL-009 | Favorites cleaned up | 1. Add some favorites<br>2. Delete account<br>3. Check Firestore | User's favorites document is deleted from Firestore |
 | DEL-010 | User removed from Firebase Auth | 1. Delete account<br>2. Check Firebase Auth console | User no longer appears in Authentication users list |
 
-### 15.3 Admin Restriction
+### 18.3 Admin Restriction
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -525,9 +650,9 @@ This document provides test cases for all implemented functionality in the Fire 
 
 ---
 
-## 16. Forgot Password
+## 19. Forgot Password
 
-### 16.1 Page Access
+### 19.1 Page Access
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -535,7 +660,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FORGOT-002 | Link from login page | 1. Navigate to `/login`<br>2. Click "Reset it here" link | Navigates to `/forgot-password` page |
 | FORGOT-003 | Page layout | 1. View forgot password page | - Card with "Forgot Password" title<br>- Description about reset email<br>- Email input field<br>- "Reset Password" button |
 
-### 16.2 Password Reset Flow
+### 19.2 Password Reset Flow
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -545,7 +670,7 @@ This document provides test cases for all implemented functionality in the Fire 
 | FORGOT-007 | Button disabled during submit | 1. Enter email<br>2. Click Reset Password<br>3. Observe button | Button shows "Sending..." and is disabled |
 | FORGOT-008 | Invalid email handling | 1. Enter non-registered email<br>2. Click Reset Password | Error toast or Firebase handles silently (security) |
 
-### 16.3 Route Protection
+### 19.3 Route Protection
 
 | Test ID | Test Case | Steps | Expected Result |
 |---------|-----------|-------|-----------------|
@@ -576,6 +701,18 @@ Description: This is a beautiful test property with amazing views and modern ame
 - M1 1AE (Manchester)
 - B1 1AA (Birmingham)
 - EH1 1AA (Edinburgh)
+
+### Valid Password for Testing
+
+- `TestPass1!` - meets all requirements (6+ chars, uppercase, lowercase, number, special char)
+
+### Invalid Passwords for Testing
+
+- `abc123` - no uppercase, no special char
+- `ABCDEF1!` - no lowercase
+- `Abcdef!` - no number
+- `Abcdef1` - no special char
+- `Ab1!` - too short
 
 ---
 

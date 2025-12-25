@@ -189,7 +189,7 @@ This project is configured for deployment on **Vercel**. See [DEPLOYMENT.md](./D
 - [x] Admin dashboard with role-based access
 - [x] Account management (password update, deletion)
 - [x] Vercel deployment with environment configuration
-- [ ] Google OAuth authentication
+- [x] Google OAuth authentication
 - [ ] Property image optimization with next/image
 - [ ] Real-time property updates with Firestore listeners
 - [ ] Email notifications for favorites
