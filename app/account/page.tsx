@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import UpdatePasswordForm from "./update-password-form";
 
 export default async function Account() {
   const cookieStore = await cookies();
@@ -41,9 +42,7 @@ export default async function Account() {
           <Label>Email</Label>
           <div>{decodedToken.email}</div>
 
-          {isPasswordProvider && (
-            <div className="mt-4">update password form</div>
-          )}
+          {isPasswordProvider && <UpdatePasswordForm />}
         </CardContent>
       </Card>
     </div>
