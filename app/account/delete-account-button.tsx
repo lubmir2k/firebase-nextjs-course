@@ -22,6 +22,7 @@ import {
   deleteUser,
 } from "firebase/auth";
 import { removeToken } from "@/context/actions";
+import { deleteUserFavourites } from "./actions";
 import { toast } from "sonner";
 
 export default function DeleteAccountButton() {
@@ -38,6 +39,7 @@ export default function DeleteAccountButton() {
         auth.currentUser,
         EmailAuthProvider.credential(auth.currentUser.email, password)
       );
+      await deleteUserFavourites();
       await deleteUser(auth.currentUser);
       await removeToken();
       toast.success("Your account was deleted successfully");
