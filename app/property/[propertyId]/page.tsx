@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import { getPropertyById } from "@/data/properties";
 import { BedIcon, BathIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
