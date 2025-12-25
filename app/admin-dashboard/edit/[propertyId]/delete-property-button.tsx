@@ -40,15 +40,17 @@ export default function DeletePropertyButton({ propertyId, images }: Props) {
 
     setIsDeleting(true);
     try {
-      const deletePromises = images.map((image) => deleteObject(ref(storage, image)));
-      await Promise.all(deletePromises);
-
+      // Delete Firestore document first (orphaned images are less problematic than broken property records)
       const response = await deleteProperty(propertyId, authToken);
 
       if (response?.error) {
         toast.error(response.message);
         return;
       }
+
+      // Then delete images from storage
+      const deletePromises = images.map((image) => deleteObject(ref(storage, image)));
+      await Promise.all(deletePromises);
 
       toast.success("Property deleted successfully");
       router.push("/admin-dashboard");
