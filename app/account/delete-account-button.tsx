@@ -57,7 +57,7 @@ export default function DeleteAccountButton() {
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog onOpenChange={(open) => !open && setPassword("")}>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="w-full">
           Delete Account

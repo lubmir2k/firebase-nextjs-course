@@ -30,7 +30,7 @@ export default async function Account() {
   }
 
   const user = await auth.getUser(decodedToken.uid);
-  const isPasswordProvider = !!user.providerData.find(
+  const isPasswordProvider = user.providerData.some(
     (provider) => provider.providerId === "password"
   );
 
