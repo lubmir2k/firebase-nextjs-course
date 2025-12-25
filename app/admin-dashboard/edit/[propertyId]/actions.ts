@@ -57,5 +57,15 @@ export const deleteProperty = async (propertyId: string, authToken: string) => {
     };
   }
 
-  await firestore.collection("properties").doc(propertyId).delete();
+  try {
+    await firestore.collection("properties").doc(propertyId).delete();
+    revalidatePath(`/property/${propertyId}`);
+    revalidatePath("/property-search");
+  } catch (e) {
+    console.error("Failed to delete property:", e);
+    return {
+      error: true,
+      message: "Failed to delete property",
+    };
+  }
 };

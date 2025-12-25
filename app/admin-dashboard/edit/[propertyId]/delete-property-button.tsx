@@ -40,12 +40,8 @@ export default function DeletePropertyButton({ propertyId, images }: Props) {
 
     setIsDeleting(true);
     try {
-      const storageTasks: Promise<void>[] = [];
-      images.forEach((image) => {
-        const imageRef = ref(storage, image);
-        storageTasks.push(deleteObject(imageRef));
-      });
-      await Promise.all(storageTasks);
+      const deletePromises = images.map((image) => deleteObject(ref(storage, image)));
+      await Promise.all(deletePromises);
 
       const response = await deleteProperty(propertyId, authToken);
 
